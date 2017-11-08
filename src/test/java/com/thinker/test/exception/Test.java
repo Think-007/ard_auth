@@ -1,4 +1,4 @@
-package com.thinker.gate.exception;
+package com.thinker.test.exception;
 
 import com.thinker.auth.exception.UserNameRepeatException;
 

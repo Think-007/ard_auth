@@ -1,4 +1,4 @@
-package com.thinker.gate.test;
+package com.thinker.test.test;
 
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.apache.shiro.crypto.hash.SimpleHash;

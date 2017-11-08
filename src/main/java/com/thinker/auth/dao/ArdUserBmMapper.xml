@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.thinker.auth.dao.ArdUserMapper">
+<mapper namespace="com.thinker.auth.dao.ArdUserBmMapper">
 
-	<insert id="insertArdUser" parameterType="ArdUser">
+	<insert id="insertUserBm" parameterType="ArdUserBm">
 
-		insert into ard_user(
+		insert into ard_user_bm(
 		user_id,
-		password,
-		salt)
+		usrename)
 		values(
 		#{userId},
-		#{password},
-		#{salt}
+		#{userName}
 		)
 
 	</insert>

@@ -151,9 +151,7 @@ public class GateController {
 			System.out.println(password);
 			// shiro认证登录
 			login(result, telnum, password);
-
-			// 4.生成token
-			String loginToken = TokenUtil.generateToken(telnum);
+			
 
 		} catch (Throwable t) {
 			result.setRetCode(ProcessResult.FAILED);
@@ -184,6 +182,8 @@ public class GateController {
 			if (subject.isAuthenticated()) {
 
 				result.setRetCode(ProcessResult.SUCCESS);
+				String loginToken = TokenUtil.generateToken(telnum);
+				result.setRetMsg(loginToken);
 
 			}
 

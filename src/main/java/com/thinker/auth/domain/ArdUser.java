@@ -21,10 +21,7 @@ public class ArdUser implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	// 用户id
-	private double userId;
-
-	// 用户名
-	private String userName;
+	private String userId;
 
 	// 用户密码
 	private String password;
@@ -44,20 +41,12 @@ public class ArdUser implements Serializable {
 	// 用户角色
 	private List<ArdRole> roles;
 
-	public double getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(double userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
 	}
 
 	public String getPassword() {
@@ -110,10 +99,8 @@ public class ArdUser implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ArdUser [userId=" + userId + ", userName=" + userName
-				+ ", password=" + password + ", salt=" + salt + ", sex=" + sex
-				+ ", status=" + status + ", level=" + level + ", roles="
-				+ roles + "]";
+		return "ArdUser [userId=" + userId + ", password=" + password + ", salt=" + salt + ", sex=" + sex + ", status="
+				+ status + ", level=" + level + ", roles=" + roles + "]";
 	}
 
 }

@@ -4,10 +4,12 @@
  * History:
  * ------------------------------------------------------------------------------
  * Date    	|  Who  		|  What  
- * 2017年10月27日	| LPF 	| 	create the file                       
+ * 2017年11月8日	| LPF 	| 	create the file                       
  */
 
-package com.thinker.gate.test;
+package com.thinker.auth.dao;
+
+import com.thinker.auth.domain.ArdUserBm;
 
 /**
  * 
@@ -21,12 +23,9 @@ package com.thinker.gate.test;
  * 
  */
 
-public class TestMain {
+public interface ArdUserBmMapper {
 
-	public static void main(String[] args) {
-
-		char[] data = { '1', '2', '3' };
-		System.out.println(String.copyValueOf(data));
-	}
+	// 创建用户名
+	public int insertUserBm(ArdUserBm ardUserBm);
 
 }

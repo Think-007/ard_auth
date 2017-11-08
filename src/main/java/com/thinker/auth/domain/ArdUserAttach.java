@@ -10,7 +10,7 @@ public class ArdUserAttach implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	// 用户id
-	private double userId;
+	private String  userId;
 	// 用户电话
 	private String telNum;
 	// 缩略图地址
@@ -18,11 +18,12 @@ public class ArdUserAttach implements Serializable {
 	// 头像地址
 	private String headpicURL;
 
-	public double getUserId() {
+
+	public String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(double userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 

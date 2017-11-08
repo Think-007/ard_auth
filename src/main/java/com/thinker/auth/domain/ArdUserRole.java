@@ -9,13 +9,13 @@ public class ArdUserRole implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 	//用户id
-	private double userId;
+	private String userId;
 	//角色id
 	private int roleId;
-	public double getUserId() {
+	public String getUserId() {
 		return userId;
 	}
-	public void setUserId(double userId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 	public int getRoleId() {
