@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50710
 File Encoding         : 65001
 
-Date: 2017-11-08 22:15:06
+Date: 2017-11-08 22:51:33
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -102,6 +102,7 @@ CREATE TABLE `ard_role` (
   `role_id` int(11) NOT NULL,
   `role_name` varchar(64) DEFAULT NULL,
   `role_desc` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -112,6 +113,8 @@ DROP TABLE IF EXISTS `ard_role_permission`;
 CREATE TABLE `ard_role_permission` (
   `role_id` int(11) DEFAULT NULL,
   `source_id` int(11) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   KEY `role_id` (`role_id`),
   CONSTRAINT `ard_role_permission_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `ard_role` (`role_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -127,6 +130,8 @@ CREATE TABLE `ard_user` (
   `sex` tinyint(4) DEFAULT '0',
   `status` mediumint(16) DEFAULT '0',
   `level` mediumint(16) DEFAULT '0',
+  `create_time` datetime NOT NULL,
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -142,6 +147,8 @@ CREATE TABLE `ard_user_attach` (
   `tel_num` varchar(20) NOT NULL,
   `thumb_url` varchar(255) DEFAULT NULL,
   `headpic_url` varchar(255) DEFAULT NULL,
+  `create_time` datetime NOT NULL,
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`tel_num`),
   UNIQUE KEY `telnumber` (`tel_num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -155,6 +162,8 @@ DROP TABLE IF EXISTS `ard_user_bm`;
 CREATE TABLE `ard_user_bm` (
   `user_id` varchar(30) NOT NULL,
   `username` varchar(32) NOT NULL,
+  `create_time` datetime NOT NULL,
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`username`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -168,8 +177,9 @@ DROP TABLE IF EXISTS `ard_user_role`;
 CREATE TABLE `ard_user_role` (
   `user_id` varchar(30) NOT NULL,
   `role_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`user_id`),
-  UNIQUE KEY `user_id` (`user_id`)
+  `create_time` datetime NOT NULL,
+  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 /*!50100 PARTITION BY KEY (user_id)
 PARTITIONS 10 */;
