@@ -18,5 +18,7 @@ public class ArdError {
 	public static final int ACCOUNT_LOGOUT = 10005;
 	// 验证码错误
 	public static final int SMS_CODE_ERROR = 10006;
+	// 电话号码已经注册
+	public static final int TEL_NUM_REGISTED = 10007;
 
 }

@@ -47,20 +47,22 @@ public class ShiroRealmImpl extends AuthorizingRealm {
 
 		UsernamePasswordToken authToken = (UsernamePasswordToken) token;
 
-		String userName = authToken.getUsername();
+		String telnumber = authToken.getUsername();
 		String password = String.copyValueOf(authToken.getPassword());
 
 		// 数据库用户名
 		String sqlUserName = "18201410900";
+		
+		//根据电话号码查询用户id ,再查询用户信息
 
-		if (!userName.equals(sqlUserName)) {
+		if (!telnumber.equals(sqlUserName)) {
 			return null;
 		}
 
 		// 数据库盐值
 		String sqlSalt = "333";
 
-		return new SimpleAuthenticationInfo(userName, password,
+		return new SimpleAuthenticationInfo(telnumber, password,
 				ByteSource.Util.bytes(sqlSalt), getName());
 
 	}
