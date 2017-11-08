@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinker.auth.dao.MysqlMapper">
+
+
+	<insert id="insertUserAttach">
+		insert into ard_user_attach(
+		user_id,
+		tel_num,
+		thumb_url,
+		headpic_url
+		)
+		values(
+		#{userId},
+		#{telNum},
+		#{thumbURL},
+		#{headpicURL}
+		)
+	
+	</insert>
+
+
+	<!-- <select id="queryComissionCountAndSum" resultType="java.util.Map"> 
+		select count(*) as count, ifnull(sum(amount),0) as sumAmount from comission_record 
+		t where to_days(t.startTime) = to_days(now()) and t.status in (0,-1) </select> 
+		<select id="queryComissionRecord" resultType="ComissionRecordResult"> select 
+		sum(t.amount) as transferAmount, t.agentName as agentName, t.tillNumber as 
+		tillNumber, t.agentRealName as realName, count(*) as transactionNumber, sum(t.comission) 
+		as agentComissionAmount, sum(t.parentComission) as superAgentComissionAmount 
+		from comission_record t where 1=1 <if test="name != null and name != ''"> 
+		and (t.agentName=#{name} or t.agentRealName=#{name}) </if> <if test="tillNumber 
+		!= null and tillNumber != ''"> and t.tillNumber=#{tillNumber} </if> and t.parentTillNumber=#{supAgentTillNumber} 
+		and DATE_FORMAT( startTime, '%Y%m' ) = DATE_FORMAT(#{month} , '%Y%m' ) and 
+		t.status in (0) group by agentName order by tillNumber desc </select> <select 
+		id="querySupAgentComission" resultType="java.util.Map"> select * from (select 
+		sum(parentComission) as dayComissionSum from comission_record where parentTillNumber=#{supAgentTillNumber} 
+		and to_days(startTime) = to_days(now())and status in (0,-1)) day, (select 
+		sum(parentComission) as monthComissionSum from comission_record where parentTillNumber=#{supAgentTillNumber} 
+		and date_format(startTime, '%Y%m' ) = date_format( curdate( ) , '%Y%m' ) 
+		and status in (0,-1)) month, (select sum(parentComission) as yearComissionSum 
+		from comission_record where parentTillNumber=#{supAgentTillNumber} and year(startTime)=year(now()) 
+		and status in (0,-1)) year </select> <select id="querySupagentSumComissionByMonth" 
+		resultType="java.util.Map"> select sum(parentComission) as monthComissionSum 
+		from comission_record where parentTillNumber=#{supAgentTillNumber} and status=0 
+		and date_format(startTime, '%Y%m' ) = date_format( #{month} , '%Y%m' ) </select> 
+		<select id="queryAllTransactionsByTime" resultType="java.util.Map"> select 
+		sum(amount) as transferAmtSum <if test="queryTime !=null and queryTime != 
+		'' and queryTime == 'year' "> ,date_format(startTime,'%Y%m' ) as sumTime 
+		</if> <if test="queryTime !=null and queryTime != '' and queryTime == 'month' 
+		"> ,date_format(startTime,'%Y%m%d' ) as sumTime </if> <if test="queryTime 
+		!=null and queryTime != '' and queryTime == 'day' "> ,date_format(startTime,'%Y%m%d%H' 
+		) as sumTime </if> <if test="queryTime !=null and queryTime != '' and queryTime 
+		== 'hour' "> ,date_format(startTime,'%Y%m%d%H%i' ) as sumTime </if> <if test="queryTime 
+		!=null and queryTime != '' and queryTime == 'minute' "> ,date_format(startTime,'%Y%m%d%H%i%s' 
+		) as sumTime </if> from comission_record where status in (0,-1) <if test="queryTime 
+		!=null and queryTime != '' and queryTime == 'year' "> and year(startTime)=year(now()) 
+		and date_format(startTime,'%Y' )=date_format(curdate(),'%Y' ) group by (date_format(startTime, 
+		'%Y%m' )) and startTime >= (CURDATE()-interval 12 month) group by (date_format(startTime, 
+		'%Y%m' )) </if> <if test="queryTime !=null and queryTime != '' and queryTime 
+		== 'month' "> and month(startTime) = month(now()) and date_format(startTime,'%Y%m' 
+		)=date_format(curdate(),'%Y%m' ) group by (date_format(startTime, '%Y%m%d' 
+		)) and startTime >= date_sub(CURDATE(), INTERVAL 30 DAY) group by (date_format(startTime, 
+		'%Y%m%d' )) </if> <if test="queryTime !=null and queryTime != '' and queryTime 
+		== 'day' "> and to_days(startTime) = to_days(now()) and date_format(startTime,'%Y%m%d' 
+		)=date_format(curdate(),'%Y%m%d' ) group by (date_format(startTime, '%Y%m%d%H' 
+		)) and startTime >= (NOW() - interval 24 hour) group by (date_format(startTime, 
+		'%Y%m%d%H' )) </if> <if test="queryTime !=null and queryTime != '' and queryTime 
+		== 'hour' "> and hour(startTime) = hour(now()) and date_format(startTime,'%Y%m%d%H' 
+		)=date_format(curdate(),'%Y%m%d%H' ) group by (date_format(startTime, '%Y%m%d%H%i' 
+		)) </if> <if test="queryTime !=null and queryTime != '' and queryTime == 
+		'minute' "> and minute(startTime) = minute(now()) and date_format(startTime,'%Y%m%d%H%i' 
+		)=date_format(curdate(),'%Y%m%d%H%i' ) group by (date_format(startTime, '%Y%m%d%H%i%s' 
+		)) </if> </select> -->
+
+</mapper>
