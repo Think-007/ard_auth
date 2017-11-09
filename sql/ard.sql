@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 本地mysql
-Source Server Version : 50710
-Source Host           : localhost:3306
+Source Server         : 172.18.5.110
+Source Server Version : 50525
+Source Host           : 172.18.5.110:3306
 Source Database       : ard
 
 Target Server Type    : MYSQL
-Target Server Version : 50710
+Target Server Version : 50525
 File Encoding         : 65001
 
-Date: 2017-11-08 22:51:33
+Date: 2017-11-09 19:52:24
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -139,6 +139,20 @@ CREATE TABLE `ard_user` (
 PARTITIONS 10 */;
 
 -- ----------------------------
+-- Table structure for ard_user_account
+-- ----------------------------
+DROP TABLE IF EXISTS `ard_user_account`;
+CREATE TABLE `ard_user_account` (
+  `user_id` varchar(30) NOT NULL,
+  `account_type` tinyint(4) NOT NULL,
+  `balance` double DEFAULT NULL,
+  PRIMARY KEY (`user_id`,`account_type`),
+  UNIQUE KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+/*!50100 PARTITION BY KEY (user_id)
+PARTITIONS 10 */;
+
+-- ----------------------------
 -- Table structure for ard_user_attach
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_user_attach`;
@@ -193,3 +207,9 @@ CREATE TABLE `tst` (
   `val` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- View structure for ard_news_-1
+-- ----------------------------
+DROP VIEW IF EXISTS `ard_news_-1`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`172.%.%.%` SQL SECURITY DEFINER VIEW `ard_news_-1` AS select `ard`.`ard_news_0`.`id` AS `id`,`ard`.`ard_news_0`.`source` AS `source`,`ard`.`ard_news_0`.`title` AS `title`,`ard`.`ard_news_0`.`content` AS `content`,`ard`.`ard_news_0`.`publishtime` AS `publishtime` from `ard_news_0` union select `ard`.`ard_news_1`.`id` AS `id`,`ard`.`ard_news_1`.`source` AS `source`,`ard`.`ard_news_1`.`title` AS `title`,`ard`.`ard_news_1`.`content` AS `content`,`ard`.`ard_news_1`.`publishtime` AS `publishtime` from `ard_news_1` union select `ard`.`ard_news_2`.`id` AS `id`,`ard`.`ard_news_2`.`source` AS `source`,`ard`.`ard_news_2`.`title` AS `title`,`ard`.`ard_news_2`.`content` AS `content`,`ard`.`ard_news_2`.`publishtime` AS `publishtime` from `ard_news_2` union select `ard`.`ard_news_3`.`id` AS `id`,`ard`.`ard_news_3`.`source` AS `source`,`ard`.`ard_news_3`.`title` AS `title`,`ard`.`ard_news_3`.`content` AS `content`,`ard`.`ard_news_3`.`publishtime` AS `publishtime` from `ard_news_3` ;
