@@ -215,12 +215,6 @@ public class GateController {
 		return result;
 	}
 
-	@RequestMapping("/signout_req/{uid}")
-	public void checkOut(String uid) {
-
-		// app还要删除token
-
-	}
 
 	@RequestMapping("/password_reset")
 	public ProcessResult resetPassword() {
