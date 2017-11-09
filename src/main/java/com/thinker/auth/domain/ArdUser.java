@@ -4,6 +4,7 @@
 package com.thinker.auth.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class ArdUser implements Serializable {
 	// 盐值
 	private String salt;
 
-	// 性别 0未知 1男 2女
+	// 性别 0未知 1 男  2女
 	private int sex;
 
 	// 用户状态 0正常 1实名 2锁定 -1注销
@@ -40,6 +41,9 @@ public class ArdUser implements Serializable {
 
 	// 用户角色
 	private List<ArdRole> roles;
+
+	// 创建时间
+	private Date createTime;
 
 	public String getUserId() {
 		return userId;
@@ -97,10 +101,20 @@ public class ArdUser implements Serializable {
 		this.roles = roles;
 	}
 
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
 	@Override
 	public String toString() {
-		return "ArdUser [userId=" + userId + ", password=" + password + ", salt=" + salt + ", sex=" + sex + ", status="
-				+ status + ", level=" + level + ", roles=" + roles + "]";
+		return "ArdUser [userId=" + userId + ", password=" + password
+				+ ", salt=" + salt + ", sex=" + sex + ", status=" + status
+				+ ", level=" + level + ", roles=" + roles + ", createTime="
+				+ createTime + "]";
 	}
 
 }

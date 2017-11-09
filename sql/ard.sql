@@ -127,7 +127,7 @@ CREATE TABLE `ard_user` (
   `user_id` varchar(30) NOT NULL,
   `password` varchar(255) NOT NULL,
   `salt` varchar(255) DEFAULT NULL,
-  `sex` tinyint(4) DEFAULT '0',
+  `sex` tinyint(4) NOT NULL DEFAULT '0',
   `status` mediumint(16) DEFAULT '0',
   `level` mediumint(16) DEFAULT '0',
   `create_time` datetime NOT NULL,

@@ -1,5 +1,8 @@
 package com.thinker.auth.service.impl;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -35,14 +38,17 @@ public class UserRegistServiceImpl implements UserRegistService {
 
 	@Override
 	@Transactional
-	public void regitsUser(UserRegistParam userRegistParam, String salt, ArdUserRole ardUserRole) throws Exception {
+	public void regitsUser(UserRegistParam userRegistParam, String salt,
+			ArdUserRole ardUserRole) throws Exception {
 
 		// 分配用户uid
 		String userId = Math.random() * 1000000 + "";
+		Date createTime = Calendar.getInstance().getTime();
 		// 创建用户别名
 		ArdUserBm ardUserBm = new ArdUserBm();
 		ardUserBm.setUserId(userId);
 		ardUserBm.setUserName(userRegistParam.getUserName());
+		ardUserBm.setCreateTime(createTime);
 		try {
 			ardUserBmMapper.insertUserBm(ardUserBm);
 		} catch (Exception e) {
@@ -55,6 +61,7 @@ public class UserRegistServiceImpl implements UserRegistService {
 		ardUserAttach.setTelNum(userRegistParam.getTelNumber());
 		ardUserAttach.setThumbURL("固定值");
 		ardUserAttach.setHeadpicURL("固定值");
+		ardUserAttach.setCreateTime(createTime);
 		try {
 			ardUserAttachMapper.insertUserAttach(ardUserAttach);
 		} catch (Exception e1) {
@@ -64,6 +71,7 @@ public class UserRegistServiceImpl implements UserRegistService {
 
 		// 定位用户角色为普通用户
 		ardUserRole.setUserId(userId);
+		ardUserRole.setCreateTime(createTime);
 		ardUserRoleMapper.insertAruUserRole(ardUserRole);
 
 		// 注册用户
@@ -71,6 +79,7 @@ public class UserRegistServiceImpl implements UserRegistService {
 		ardUser.setUserId(userId);
 		ardUser.setPassword(userRegistParam.getPassword());
 		ardUser.setSalt(salt);
+		ardUser.setCreateTime(createTime);
 
 		ardUserMapper.insertArdUser(ardUser);
 

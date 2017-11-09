@@ -1,6 +1,7 @@
 package com.thinker.auth.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 角色权限关联类
@@ -19,6 +20,9 @@ public class ArdRolePermission implements Serializable{
 	
 	//权限id
 	private int sourceId;
+	
+	//创建时间
+	private Date createTime;
 
 	public int getRoleId() {
 		return roleId;
@@ -36,11 +40,19 @@ public class ArdRolePermission implements Serializable{
 		this.sourceId = sourceId;
 	}
 
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
 	@Override
 	public String toString() {
 		return "ArdRolePermission [roleId=" + roleId + ", sourceId=" + sourceId
-				+ "]";
+				+ ", createTime=" + createTime + "]";
 	}
-	
+
 
 }

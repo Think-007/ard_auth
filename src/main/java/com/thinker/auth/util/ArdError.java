@@ -1,6 +1,6 @@
 package com.thinker.auth.util;
 
-public class ArdError {
+public interface ArdError {
 
 	// 异常错误码
 	public static final int EXCEPTION = -1000;

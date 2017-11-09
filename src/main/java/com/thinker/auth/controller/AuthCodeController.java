@@ -98,17 +98,17 @@ public class AuthCodeController {
 	 * @return
 	 */
 	@RequestMapping(value = "/authentication", method = RequestMethod.GET)
-	public ProcessResult authSmsCode(String telnum, String smsCode) {
+	public ProcessResult authSmsCode(String telNumber, String smsCode) {
 		ArdLog.info(logger, "enter authSmsCode", null, smsCode);
 
 		ProcessResult processResult = new ProcessResult();
-		String code = (String) redis.get(telnum);
+		String code = (String) redis.get(telNumber);
 
 		// 校验短信验证码是否正确
 		if (smsCode != null && smsCode.equals(code)) {
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
-			redis.remove(telnum);
+			redis.remove(telNumber);
 		} else {
 			processResult.setRetCode(ProcessResult.FAILED);
 			processResult.setRetMsg("failed");

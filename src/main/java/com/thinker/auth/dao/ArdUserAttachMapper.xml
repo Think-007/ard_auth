@@ -8,13 +8,15 @@
 		user_id,
 		tel_num,
 		thumb_url,
-		headpic_url
+		headpic_url,
+		create_time
 		)
 		values(
 		#{userId},
 		#{telNum},
 		#{thumbURL},
-		#{headpicURL}
+		#{headpicURL},
+		#{createTime}
 		)
 	
 	</insert>

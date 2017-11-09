@@ -10,6 +10,7 @@
 package com.thinker.auth.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 
@@ -35,6 +36,9 @@ public class ArdUserBm implements Serializable {
 	// 用户名
 	private String userName;
 
+	// 创建时间
+	private Date createTime;
+
 	public String getUserId() {
 		return userId;
 	}
@@ -47,13 +51,22 @@ public class ArdUserBm implements Serializable {
 		return userName;
 	}
 
-	@Override
-	public String toString() {
-		return "ArdUserBm [userId=" + userId + ", userName=" + userName + "]";
-	}
-
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	@Override
+	public String toString() {
+		return "ArdUserBm [userId=" + userId + ", userName=" + userName
+				+ ", createTime=" + createTime + "]";
 	}
 
 }

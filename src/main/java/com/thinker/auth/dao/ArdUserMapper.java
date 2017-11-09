@@ -12,10 +12,18 @@ public interface ArdUserMapper {
 	 */
 	public int insertArdUser(ArdUser ardUser);
 
-//	public int deleteArdUser(ArdUser ardUser);
-//
-//	public int updateArdUser(ArdUser ardUser);
-//
-//	public int queryArdUser(ArdUser ardUser);
+	/**
+	 * 根据电话号查询用户信息
+	 * 
+	 * @param telNumber
+	 * @return
+	 */
+	public ArdUser queryArdUserByTelNumber(String telNumber);
+
+	// public int deleteArdUser(ArdUser ardUser);
+	//
+	// public int updateArdUser(ArdUser ardUser);
+	//
+	// public int queryArdUser(ArdUser ardUser);
 
 }

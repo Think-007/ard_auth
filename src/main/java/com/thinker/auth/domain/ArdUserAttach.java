@@ -1,6 +1,7 @@
 package com.thinker.auth.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class ArdUserAttach implements Serializable {
 
@@ -10,7 +11,7 @@ public class ArdUserAttach implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	// 用户id
-	private String  userId;
+	private String userId;
 	// 用户电话
 	private String telNum;
 	// 缩略图地址
@@ -18,6 +19,8 @@ public class ArdUserAttach implements Serializable {
 	// 头像地址
 	private String headpicURL;
 
+	// 创建时间
+	private Date createTime;
 
 	public String getUserId() {
 		return userId;
@@ -51,10 +54,19 @@ public class ArdUserAttach implements Serializable {
 		this.headpicURL = headpicURL;
 	}
 
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
 	@Override
 	public String toString() {
 		return "ArdUserAttach [userId=" + userId + ", telNum=" + telNum
-				+ ", thumbURL=" + thumbURL + ", headpicURL=" + headpicURL + "]";
+				+ ", thumbURL=" + thumbURL + ", headpicURL=" + headpicURL
+				+ ", createTime=" + createTime + "]";
 	}
 
 }

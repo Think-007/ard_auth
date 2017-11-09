@@ -34,8 +34,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.think.creator.domain.ProcessResult;
 import com.thinker.auth.domain.ArdUserRole;
 import com.thinker.auth.domain.UserRegistParam;
+import com.thinker.auth.exception.PassWordErrorException;
 import com.thinker.auth.exception.TelNumberRepeatException;
+import com.thinker.auth.exception.UserLockException;
 import com.thinker.auth.exception.UserNameRepeatException;
+import com.thinker.auth.exception.UserNotExistException;
+import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserRegistService;
 import com.thinker.auth.util.ArdError;
 import com.thinker.auth.util.ArdLog;
@@ -69,6 +73,9 @@ public class GateController {
 	@Resource
 	private UserRegistService userRegistService;
 
+	@Resource
+	private AuthUserService authUserService;
+
 	@RequestMapping("/registration")
 	@ResponseBody
 	public ProcessResult registUser(UserRegistParam userRegistParam) {
@@ -89,6 +96,7 @@ public class GateController {
 			Md5Hash mh = new Md5Hash(userRegistParam.getPassword(), saltStr,
 					hashIterations);
 			System.out.println(mh.toString());
+			userRegistParam.setPassword(mh.toString());
 
 			// 3.创建用户,并绑定信息,默认roleid为0 ，是普通用户
 
@@ -143,15 +151,46 @@ public class GateController {
 
 		ProcessResult result = new ProcessResult();
 		result.setRetCode(ProcessResult.FAILED);
+		result.setRetMsg("failed");
 
 		try {
-			String telnum = request.getParameter("telnum");
+			String telnum = request.getParameter("telNumber");
 			String password = request.getParameter("password");
 			System.out.println(telnum);
 			System.out.println(password);
-			// shiro认证登录
-			login(result, telnum, password);
-			
+
+			// 1、用户认证
+			String msg;
+
+			try {
+
+				if (authUserService.authUser(telnum, password)) {
+
+					result.setRetCode(ProcessResult.SUCCESS);
+					String loginToken = TokenUtil.generateToken(telnum);
+					result.setRetMsg(loginToken);
+					// 2、返回用户信息
+
+				}
+
+			} catch (PassWordErrorException e) {
+				msg = "登录密码错误. Password for account " + telnum
+						+ " was incorrect.";
+				result.setErrorCode(ArdError.PASSWORD_ERROR);
+				result.setErrorDesc(msg);
+				System.out.println(msg);
+			} catch (UserLockException e) {
+				msg = "帐号已被锁定. The account for username " + telnum
+						+ " was disabled.";
+				result.setErrorCode(ArdError.USER_LOCKED);
+				result.setErrorDesc(msg);
+				System.out.println(msg);
+			} catch (UserNotExistException e) {
+				msg = "帐号不存在. There is no user with username of " + telnum;
+				result.setErrorCode(ArdError.USER_NOT_EXIST);
+				result.setErrorDesc(msg);
+				System.out.println(msg);
+			}
 
 		} catch (Throwable t) {
 			result.setRetCode(ProcessResult.FAILED);
@@ -163,50 +202,51 @@ public class GateController {
 		return result;
 	}
 
-	/**
-	 * 登录
-	 * 
-	 * @param result
-	 * @param userName
-	 * @param password
-	 */
-	private void login(ProcessResult result, String telnum, String password) {
-		String msg;
-		UsernamePasswordToken token = new UsernamePasswordToken(telnum,
-				password);
-		token.setRememberMe(true);
-		Subject subject = SecurityUtils.getSubject();
-		try {
-			subject.login(token);
-
-			if (subject.isAuthenticated()) {
-
-				result.setRetCode(ProcessResult.SUCCESS);
-				String loginToken = TokenUtil.generateToken(telnum);
-				result.setRetMsg(loginToken);
-
-			}
-
-		} catch (IncorrectCredentialsException e) {
-			msg = "登录密码错误. Password for account " + token.getPrincipal()
-					+ " was incorrect.";
-			result.setErrorCode(ArdError.PASSWORD_ERROR);
-			result.setErrorDesc(msg);
-			System.out.println(msg);
-		} catch (DisabledAccountException e) {
-			msg = "帐号已被注销. The account for username " + token.getPrincipal()
-					+ " was disabled.";
-			result.setErrorCode(ArdError.ACCOUNT_LOGOUT);
-			result.setErrorDesc(msg);
-			System.out.println(msg);
-		} catch (UnknownAccountException e) {
-			msg = "帐号不存在. There is no user with username of "
-					+ token.getPrincipal();
-			result.setErrorCode(ArdError.USER_NOT_EXIST);
-			result.setErrorDesc(msg);
-			System.out.println(msg);
-		}
-	}
+	// /**
+	// * 登录
+	// *
+	// * @param result
+	// * @param userName
+	// * @param password
+	// */
+	// private void login(ProcessResult result, String telnum, String password)
+	// {
+	// String msg;
+	// UsernamePasswordToken token = new UsernamePasswordToken(telnum,
+	// password);
+	// token.setRememberMe(true);
+	// Subject subject = SecurityUtils.getSubject();
+	// try {
+	// subject.login(token);
+	//
+	// if (subject.isAuthenticated()) {
+	//
+	// result.setRetCode(ProcessResult.SUCCESS);
+	// String loginToken = TokenUtil.generateToken(telnum);
+	// result.setRetMsg(loginToken);
+	//
+	// }
+	//
+	// } catch (IncorrectCredentialsException e) {
+	// msg = "登录密码错误. Password for account " + token.getPrincipal()
+	// + " was incorrect.";
+	// result.setErrorCode(ArdError.PASSWORD_ERROR);
+	// result.setErrorDesc(msg);
+	// System.out.println(msg);
+	// } catch (DisabledAccountException e) {
+	// msg = "帐号已被注销. The account for username " + token.getPrincipal()
+	// + " was disabled.";
+	// result.setErrorCode(ArdError.ACCOUNT_LOGOUT);
+	// result.setErrorDesc(msg);
+	// System.out.println(msg);
+	// } catch (UnknownAccountException e) {
+	// msg = "帐号不存在. There is no user with username of "
+	// + token.getPrincipal();
+	// result.setErrorCode(ArdError.USER_NOT_EXIST);
+	// result.setErrorDesc(msg);
+	// System.out.println(msg);
+	// }
+	// }
 
 	// /**
 	// * web端登录地址

@@ -2,19 +2,38 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.thinker.auth.dao.ArdUserMapper">
 
+	<resultMap type="ArdUser" id="ardUserResultMap">
+		<id property="userId" column="user_id" />
+		<result property="password" column="password" />
+		<result property="salt" column="salt" />
+		<result property="sex" column="sex" />
+		<result property="status" column="user_status" />
+		<result property="level" column="level" />
+	</resultMap>
+
+
 	<insert id="insertArdUser" parameterType="ArdUser">
 
 		insert into ard_user(
 		user_id,
 		password,
-		salt)
+		salt,
+		create_time)
 		values(
 		#{userId},
 		#{password},
-		#{salt}
+		#{salt},
+		#{createTime}
 		)
 
 	</insert>
+
+	<select id="queryArdUserByTelNumber" resultType="ArdUser">
+		select t1.user_id as userId,t1.password as password,t1.salt as salt,t1.status as status
+		from ard_user t1 join ard_user_attach t2 on t1.user_id=t2.user_id
+		where t2.tel_num=#{telNumber}
+
+	</select>
 
 
 

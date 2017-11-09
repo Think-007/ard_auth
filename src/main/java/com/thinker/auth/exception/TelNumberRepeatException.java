@@ -6,7 +6,7 @@ package com.thinker.auth.exception;
  * @author lipengfeia
  *
  */
-public class TelNumberRepeatException extends Exception {
+public class TelNumberRepeatException extends RuntimeException {
 
 	/**
 	 * 
@@ -15,10 +15,29 @@ public class TelNumberRepeatException extends Exception {
 
 	public TelNumberRepeatException() {
 		super();
+		// TODO Auto-generated constructor stub
 	}
 
-	public TelNumberRepeatException(String msg) {
-		super(msg);
+	public TelNumberRepeatException(String message, Throwable cause,
+			boolean enableSuppression, boolean writableStackTrace) {
+		super(message, cause, enableSuppression, writableStackTrace);
+		// TODO Auto-generated constructor stub
 	}
+
+	public TelNumberRepeatException(String message, Throwable cause) {
+		super(message, cause);
+		// TODO Auto-generated constructor stub
+	}
+
+	public TelNumberRepeatException(String message) {
+		super(message);
+		// TODO Auto-generated constructor stub
+	}
+
+	public TelNumberRepeatException(Throwable cause) {
+		super(cause);
+		// TODO Auto-generated constructor stub
+	}
+
 
 }

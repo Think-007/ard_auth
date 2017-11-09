@@ -13,8 +13,6 @@ import org.springframework.context.annotation.PropertySource;
  * Copyright (c) 2017, LPF 版权所有!
  */
 @Configuration
-@PropertySource({ "classpath:config/other/system.properties",
-		"classpath:config/other/shiro.properties",
-		"classpath:config/other/hessian.properties" })
+@PropertySource({ "classpath:config/other/system.properties" })
 public class PropertyConfgi {
 }
