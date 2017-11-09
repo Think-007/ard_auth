@@ -1,6 +1,9 @@
 package com.thinker.auth.dao;
 
+import java.util.Map;
+
 import com.thinker.auth.domain.ArdUser;
+import com.thinker.auth.domain.UserInfoDetail;
 
 public interface ArdUserMapper {
 
@@ -19,6 +22,14 @@ public interface ArdUserMapper {
 	 * @return
 	 */
 	public ArdUser queryArdUserByTelNumber(String telNumber);
+
+	/**
+	 * 根据电话号码查询用户详情
+	 * 
+	 * @param telNumber
+	 * @return
+	 */
+	public UserInfoDetail queryArdUserDetailByTelNumber(String telNumber);
 
 	// public int deleteArdUser(ArdUser ardUser);
 	//

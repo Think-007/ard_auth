@@ -14,5 +14,5 @@ import org.springframework.context.annotation.PropertySource;
  */
 @Configuration
 @PropertySource({ "classpath:config/other/system.properties" })
-public class PropertyConfgi {
+public class PropertyConfig {
 }

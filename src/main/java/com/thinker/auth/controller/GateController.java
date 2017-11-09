@@ -10,6 +10,8 @@
 package com.thinker.auth.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -17,12 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.DisabledAccountException;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.think.creator.domain.ProcessResult;
 import com.thinker.auth.domain.ArdUserRole;
+import com.thinker.auth.domain.UserInfoDetail;
 import com.thinker.auth.domain.UserRegistParam;
 import com.thinker.auth.exception.PassWordErrorException;
 import com.thinker.auth.exception.TelNumberRepeatException;
@@ -40,6 +38,7 @@ import com.thinker.auth.exception.UserLockException;
 import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.exception.UserNotExistException;
 import com.thinker.auth.service.AuthUserService;
+import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.service.UserRegistService;
 import com.thinker.auth.util.ArdError;
 import com.thinker.auth.util.ArdLog;
@@ -70,11 +69,17 @@ public class GateController {
 	@Value("${salt.hashIterations}")
 	private int hashIterations;
 
+	// 用户主存业务
 	@Resource
 	private UserRegistService userRegistService;
 
+	// 用户登录鉴权业务
 	@Resource
 	private AuthUserService authUserService;
+
+	// 用户信息业务
+	@Resource
+	private UserInfoService userInfoService;
 
 	@RequestMapping("/registration")
 	@ResponseBody
@@ -167,9 +172,17 @@ public class GateController {
 				if (authUserService.authUser(telnum, password)) {
 
 					result.setRetCode(ProcessResult.SUCCESS);
+					result.setRetMsg("ok");
 					String loginToken = TokenUtil.generateToken(telnum);
-					result.setRetMsg(loginToken);
 					// 2、返回用户信息
+					UserInfoDetail userInfoDetail = userInfoService
+							.getUserInfoDetailByTelNumber(telnum);
+					Map<Object, Object> map = new HashMap<Object, Object>();
+					map.put("userInof", userInfoDetail);
+					map.put("token", loginToken);
+					result.setRetObj(map);
+
+					// 3、存储token和用户信息
 
 				}
 
@@ -202,120 +215,9 @@ public class GateController {
 		return result;
 	}
 
-	// /**
-	// * 登录
-	// *
-	// * @param result
-	// * @param userName
-	// * @param password
-	// */
-	// private void login(ProcessResult result, String telnum, String password)
-	// {
-	// String msg;
-	// UsernamePasswordToken token = new UsernamePasswordToken(telnum,
-	// password);
-	// token.setRememberMe(true);
-	// Subject subject = SecurityUtils.getSubject();
-	// try {
-	// subject.login(token);
-	//
-	// if (subject.isAuthenticated()) {
-	//
-	// result.setRetCode(ProcessResult.SUCCESS);
-	// String loginToken = TokenUtil.generateToken(telnum);
-	// result.setRetMsg(loginToken);
-	//
-	// }
-	//
-	// } catch (IncorrectCredentialsException e) {
-	// msg = "登录密码错误. Password for account " + token.getPrincipal()
-	// + " was incorrect.";
-	// result.setErrorCode(ArdError.PASSWORD_ERROR);
-	// result.setErrorDesc(msg);
-	// System.out.println(msg);
-	// } catch (DisabledAccountException e) {
-	// msg = "帐号已被注销. The account for username " + token.getPrincipal()
-	// + " was disabled.";
-	// result.setErrorCode(ArdError.ACCOUNT_LOGOUT);
-	// result.setErrorDesc(msg);
-	// System.out.println(msg);
-	// } catch (UnknownAccountException e) {
-	// msg = "帐号不存在. There is no user with username of "
-	// + token.getPrincipal();
-	// result.setErrorCode(ArdError.USER_NOT_EXIST);
-	// result.setErrorDesc(msg);
-	// System.out.println(msg);
-	// }
-	// }
-
-	// /**
-	// * web端登录地址
-	// *
-	// * @return
-	// */
-	// @RequestMapping("/web_authentication")
-	// public ModelAndView webLogin(HttpServletRequest request,
-	// HttpServletResponse response, Model model) {
-	//
-	// ModelAndView mv = new ModelAndView();
-	// // 1、校验验证码
-	//
-	// // 2、校验用户信息
-	//
-	// try {
-	// String msg = "";
-	// String userName = request.getParameter("userName");
-	// String password = request.getParameter("password");
-	// System.out.println(userName);
-	// System.out.println(password);
-	// UsernamePasswordToken token = new UsernamePasswordToken(userName,
-	// password);
-	// token.setRememberMe(true);
-	// Subject subject = SecurityUtils.getSubject();
-	// try {
-	// subject.login(token);
-	// if (subject.isAuthenticated()) {
-	//
-	// mv.addObject("retcode", "0");
-	// mv.setViewName("/admin/mainpage");
-	// return mv;
-	// }
-	// mv.addObject("retcode", "-1");
-	// mv.setViewName("/home");
-	//
-	// } catch (IncorrectCredentialsException e) {
-	// msg = "登录密码错误. Password for account " + token.getPrincipal()
-	// + " was incorrect.";
-	// mv.addObject("errorcode", ArdError.PASSWORD_ERROR + "");
-	// mv.addObject("errordesc", msg);
-	// System.out.println(msg);
-	// } catch (DisabledAccountException e) {
-	// msg = "帐号已被注销. The account for username "
-	// + token.getPrincipal() + " was disabled.";
-	// mv.addObject("errorcode", ArdError.ACCOUNT_LOGOUT + "");
-	// mv.addObject("errordesc", msg);
-	// System.out.println(msg);
-	// } catch (UnknownAccountException e) {
-	// msg = "帐号不存在. There is no user with username of "
-	// + token.getPrincipal();
-	// mv.addObject("errorcode", ArdError.USER_NOT_EXIST + "");
-	// mv.addObject("errordesc", msg);
-	// System.out.println(msg);
-	// }
-	//
-	// } catch (Throwable t) {
-	// mv.addObject(ProcessResult.FAILED);
-	// mv.addObject("errorcode", ArdError.EXCEPTION + "");
-	// mv.addObject("errordesc", ArdError.EXCEPTION_MSG);
-	// t.printStackTrace();
-	// }
-	// return mv;
-	// }
-
 	@RequestMapping("/signout_req/{uid}")
 	public void checkOut(String uid) {
 
-		SecurityUtils.getSubject().logout();
 		// app还要删除token
 
 	}

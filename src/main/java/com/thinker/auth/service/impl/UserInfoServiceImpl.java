@@ -4,15 +4,28 @@ import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
+import com.thinker.auth.dao.ArdUserAttachMapper;
+import com.thinker.auth.dao.ArdUserBmMapper;
 import com.thinker.auth.dao.ArdUserMapper;
 import com.thinker.auth.domain.ArdUser;
+import com.thinker.auth.domain.ArdUserAttach;
+import com.thinker.auth.domain.UserInfoDetail;
 import com.thinker.auth.service.UserInfoService;
 
 @Service
 public class UserInfoServiceImpl implements UserInfoService {
 
+	// 用户信息查询
 	@Resource
 	private ArdUserMapper ardUserMapper;
+
+	// // 用户附属信息查询
+	// @Resource
+	// private ArdUserAttachMapper ardUserAttachMapper;
+	//
+	// // 用户别名信息查询
+	// @Resource
+	// private ArdUserBmMapper ardUserBmMapper;
 
 	@Override
 	public ArdUser getUserInfoByTelNumber(String telNumber) {
@@ -22,4 +35,12 @@ public class UserInfoServiceImpl implements UserInfoService {
 		return ardUser;
 	}
 
+	@Override
+	public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber) {
+
+		UserInfoDetail userInfoDetail = ardUserMapper
+				.queryArdUserDetailByTelNumber(telNumber);
+
+		return userInfoDetail;
+	}
 }
