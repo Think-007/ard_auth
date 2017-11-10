@@ -7,6 +7,8 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import redis.clients.jedis.JedisCluster;
+
 import com.thinker.auth.dao.ArdUserMapper;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.service.UserRegistService;
@@ -31,6 +33,15 @@ public class ArdAuthApplicationTests {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	@Resource
+	private JedisCluster jedisCluster;
+	@Test
+	public void testJedis(){
+		
+		
+		jedisCluster.set("afsda", "4354");
 	}
 
 }

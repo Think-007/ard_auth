@@ -18,15 +18,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.think.creator.domain.ProcessResult;
 import com.thinker.auth.domain.ArdUserRole;
@@ -42,6 +41,8 @@ import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.service.UserRegistService;
 import com.thinker.auth.util.ArdError;
 import com.thinker.auth.util.ArdLog;
+import com.thinker.auth.util.JsonUtils;
+import com.thinker.auth.util.Redis;
 import com.thinker.auth.util.TokenUtil;
 
 /**
@@ -55,8 +56,8 @@ import com.thinker.auth.util.TokenUtil;
  * @author LPF
  * 
  */
-@Controller
-@RequestMapping("/gate")
+@RestController
+@RequestMapping("/auth/gate")
 public class GateController {
 
 	private static final Logger logger = LoggerFactory
@@ -69,7 +70,7 @@ public class GateController {
 	@Value("${salt.hashIterations}")
 	private int hashIterations;
 
-	// 用户主存业务
+	// 用户注册业务
 	@Resource
 	private UserRegistService userRegistService;
 
@@ -81,8 +82,7 @@ public class GateController {
 	@Resource
 	private UserInfoService userInfoService;
 
-	@RequestMapping("/registration")
-	@ResponseBody
+	@RequestMapping(value = "/registration", method = RequestMethod.POST)
 	public ProcessResult registUser(UserRegistParam userRegistParam) {
 		ArdLog.info(logger, "enter registUser ", null, "userRegistParam: "
 				+ userRegistParam);
@@ -149,8 +149,7 @@ public class GateController {
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	@RequestMapping(value = "/app_authentication")
-	@ResponseBody
+	@RequestMapping(value = "/app_authentication", method = RequestMethod.POST)
 	public ProcessResult doLogin(HttpServletRequest request,
 			HttpServletResponse response, Model model) {
 
@@ -184,6 +183,9 @@ public class GateController {
 
 					// 3、存储token和用户信息
 
+					Redis.redis.put(loginToken,
+							JsonUtils.toJson(userInfoDetail));
+
 				}
 
 			} catch (PassWordErrorException e) {
@@ -215,11 +217,21 @@ public class GateController {
 		return result;
 	}
 
-
-	@RequestMapping("/password_reset")
-	public ProcessResult resetPassword() {
+	@RequestMapping(value = "/password/{uid}/{timestamp}", method = RequestMethod.PUT)
+	public ProcessResult resetPassword(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		ProcessResult result = new ProcessResult();
+
+		return result;
+
+	}
+
+	@RequestMapping("/tokenstatus")
+	public ProcessResult retTokenStatus(HttpServletRequest request,
+			HttpServletResponse response) {
+		ProcessResult result = (ProcessResult) request
+				.getAttribute("processResult");
 
 		return result;
 

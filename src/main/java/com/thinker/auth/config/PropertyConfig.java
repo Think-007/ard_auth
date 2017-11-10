@@ -13,6 +13,7 @@ import org.springframework.context.annotation.PropertySource;
  * Copyright (c) 2017, LPF 版权所有!
  */
 @Configuration
-@PropertySource({ "classpath:config/other/system.properties" })
+@PropertySource({ "classpath:config/other/system.properties",
+		"classpath:config/other/redis.properties" })
 public class PropertyConfig {
 }

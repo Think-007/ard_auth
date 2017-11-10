@@ -13,6 +13,8 @@ public class UserRegistParam implements Serializable {
 	private String userName;
 	// 密码
 	private String password;
+	// 验证码
+	private String smsCode;
 	// 手机号
 	private String telNumber;
 
@@ -40,10 +42,19 @@ public class UserRegistParam implements Serializable {
 		this.telNumber = telNumber;
 	}
 
+	public String getSmsCode() {
+		return smsCode;
+	}
+
+	public void setSmsCode(String smsCode) {
+		this.smsCode = smsCode;
+	}
+
 	@Override
 	public String toString() {
 		return "UserRegistParam [userName=" + userName + ", password="
-				+ password + ", telNumber=" + telNumber + "]";
+				+ password + ", smsCode=" + smsCode + ", telNumber="
+				+ telNumber + "]";
 	}
 
 }
