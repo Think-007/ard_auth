@@ -3,10 +3,11 @@ package com.thinker.auth.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.think.creator.domain.ProcessResult;
 import com.thinker.auth.util.Redis;
@@ -28,9 +29,8 @@ public class UserCenterController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping("/headpic")
-	public ProcessResult uploadPic(HttpServletRequest request,
-			HttpServletResponse response) {
+	@RequestMapping(value = "/headpic", method = RequestMethod.POST)
+	public ProcessResult uploadPic(MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
 
 		return null;
 	}
@@ -42,9 +42,8 @@ public class UserCenterController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping("/user_head/{uid}")
-	public ProcessResult setHeadPic(HttpServletRequest request,
-			HttpServletResponse response) {
+	@RequestMapping("/user_head/")
+	public ProcessResult setHeadPic(String picPath, String micPicPath) {
 
 		return null;
 	}
@@ -57,9 +56,9 @@ public class UserCenterController {
 	 * @return
 	 */
 
-	@RequestMapping(value = "/password/old/{uid}/{timestamp}", method = RequestMethod.PUT)
-	public ProcessResult checkOldPassword(HttpServletRequest request,
-			HttpServletResponse response, String oldPassword) {
+	@RequestMapping(value = "/password/old", method = RequestMethod.GET)
+	public ProcessResult checkOldPassword(HttpServletRequest request, HttpServletResponse response,
+			String oldPassword) {
 
 		ProcessResult result = new ProcessResult();
 
@@ -74,9 +73,8 @@ public class UserCenterController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/password/new/{uid}/{timestamp}", method = RequestMethod.PUT)
-	public ProcessResult changePassword(HttpServletRequest request,
-			HttpServletResponse response, String newPassword) {
+	@RequestMapping(value = "/password/new", method = RequestMethod.PUT)
+	public ProcessResult changePassword(HttpServletRequest request, HttpServletResponse response, String newPassword) {
 
 		ProcessResult result = new ProcessResult();
 
@@ -91,9 +89,8 @@ public class UserCenterController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/telnumber/{uid}/{timestamp}", method = RequestMethod.PUT)
-	public ProcessResult resetTelnumber(HttpServletRequest request,
-			HttpServletResponse response) {
+	@RequestMapping(value = "/telnumber", method = RequestMethod.PUT)
+	public ProcessResult resetTelnumber(HttpServletRequest request, HttpServletResponse response) {
 
 		ProcessResult result = new ProcessResult();
 
@@ -109,8 +106,7 @@ public class UserCenterController {
 	 * @param uid
 	 */
 	@RequestMapping(value = "/out/{uid}/{timestamp}", method = RequestMethod.POST)
-	public void checkOut(HttpServletRequest request,
-			HttpServletResponse response, String uid) {
+	public void checkOut(HttpServletRequest request, HttpServletResponse response, String uid) {
 
 		String token = request.getHeader("token");
 		// app还要删除token

@@ -257,7 +257,7 @@ public class GateController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/password/{uid}/{timestamp}", method = RequestMethod.PUT)
+	@RequestMapping(value = "/password_reset", method = RequestMethod.PUT)
 	public ProcessResult resetPassword(HttpServletRequest request,
 			HttpServletResponse response) {
 

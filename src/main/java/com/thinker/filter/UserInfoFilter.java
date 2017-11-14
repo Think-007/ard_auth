@@ -1,6 +1,7 @@
 package com.thinker.filter;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -37,6 +38,10 @@ public class UserInfoFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) arg0;
 
 		System.out.println("进入token拦截器");
+		
+		
+		Map paraMap = request.getParameterMap();
+		
 
 		String token = request.getHeader("token");
 
