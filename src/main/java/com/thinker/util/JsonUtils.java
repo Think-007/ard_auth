@@ -1,4 +1,4 @@
-package com.thinker.auth.util;
+package com.thinker.util;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;

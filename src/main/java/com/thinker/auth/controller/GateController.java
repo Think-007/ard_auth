@@ -39,11 +39,12 @@ import com.thinker.auth.exception.UserNotExistException;
 import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.service.UserRegistService;
-import com.thinker.auth.util.ArdError;
-import com.thinker.auth.util.ArdLog;
-import com.thinker.auth.util.JsonUtils;
 import com.thinker.auth.util.Redis;
 import com.thinker.auth.util.TokenUtil;
+import com.thinker.security.RSAEncrypt;
+import com.thinker.util.ArdError;
+import com.thinker.util.ArdLog;
+import com.thinker.util.JsonUtils;
 
 /**
  * 
@@ -83,12 +84,25 @@ public class GateController {
 	private UserInfoService userInfoService;
 
 	@RequestMapping(value = "/registration", method = RequestMethod.POST)
-	public ProcessResult registUser(UserRegistParam userRegistParam) {
+	public ProcessResult registUser(String registInfo, String smsCode) {
 		ArdLog.info(logger, "enter registUser ", null, "userRegistParam: "
-				+ userRegistParam);
+				+ registInfo + "smsCode: " + smsCode);
 		ProcessResult processResult = new ProcessResult();
 
 		try {
+
+			// 解析用户登录信息密文
+			String[] userInfo = decryptReqStr(registInfo);
+
+			String telnum = userInfo[0];
+			String password = userInfo[1];
+			String userName = userInfo[3];
+
+			UserRegistParam userRegistParam = new UserRegistParam();
+			userRegistParam.setTelNumber(telnum);
+			userRegistParam.setPassword(password);
+			userRegistParam.setUserName(userName);
+
 			// 1.校验参数
 
 			// 2.密码加盐
@@ -140,6 +154,16 @@ public class GateController {
 		return processResult;
 	}
 
+	private String[] decryptReqStr(String encryptStr) throws Exception {
+		String privateKey = AuthCodeController.keyCache.get("privateKey");
+		String userInfoStr = new String(RSAEncrypt.decrypt(
+				RSAEncrypt.loadPrivateKeyByStr(privateKey),
+				encryptStr.getBytes()));
+
+		String[] userInfo = userInfoStr.split("_");
+		return userInfo;
+	}
+
 	/**
 	 * 实际的登录代码 如果登录成功，跳转至首页；登录失败，则将失败信息反馈对用户
 	 * 
@@ -150,16 +174,21 @@ public class GateController {
 	 * @throws ServletException
 	 */
 	@RequestMapping(value = "/app_authentication", method = RequestMethod.POST)
-	public ProcessResult doLogin(HttpServletRequest request,
-			HttpServletResponse response, Model model) {
+	public ProcessResult doLogin(String loginInfo, String key) {
 
 		ProcessResult result = new ProcessResult();
 		result.setRetCode(ProcessResult.FAILED);
 		result.setRetMsg("failed");
 
 		try {
-			String telnum = request.getParameter("telNumber");
-			String password = request.getParameter("password");
+			// 解析用户登录信息密文
+			String[] userInfo = decryptReqStr(loginInfo);
+			// 客户端公钥
+			String publicKey = key;
+
+			String telnum = userInfo[0];
+			String password = userInfo[1];
+
 			System.out.println(telnum);
 			System.out.println(password);
 
@@ -173,12 +202,16 @@ public class GateController {
 					result.setRetCode(ProcessResult.SUCCESS);
 					result.setRetMsg("ok");
 					String loginToken = TokenUtil.generateToken(telnum);
+					// 将token用客户端给公钥加密返回给客户端
+					String encryptToken = new String(RSAEncrypt.encrypt(
+							RSAEncrypt.loadPublicKeyByStr(publicKey),
+							loginToken.getBytes()));
 					// 2、返回用户信息
 					UserInfoDetail userInfoDetail = userInfoService
 							.getUserInfoDetailByTelNumber(telnum);
 					Map<Object, Object> map = new HashMap<Object, Object>();
 					map.put("userInof", userInfoDetail);
-					map.put("token", loginToken);
+					map.put("tokenInfo", encryptToken);
 					result.setRetObj(map);
 
 					// 3、存储token和用户信息
@@ -217,6 +250,13 @@ public class GateController {
 		return result;
 	}
 
+	/**
+	 * 忘记密码
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/password/{uid}/{timestamp}", method = RequestMethod.PUT)
 	public ProcessResult resetPassword(HttpServletRequest request,
 			HttpServletResponse response) {
@@ -227,6 +267,13 @@ public class GateController {
 
 	}
 
+	/**
+	 * token 状态判定接口
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping("/tokenstatus")
 	public ProcessResult retTokenStatus(HttpServletRequest request,
 			HttpServletResponse response) {

@@ -1,19 +1,21 @@
 package com.thinker.auth.service.impl;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.thinker.auth.controller.AuthCodeController;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.exception.PassWordErrorException;
 import com.thinker.auth.exception.UserLockException;
 import com.thinker.auth.exception.UserNotExistException;
 import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserInfoService;
-import com.thinker.auth.util.UserStatus;
+import com.thinker.security.RSAEncrypt;
+import com.thinker.util.UserStatus;
 
 @Service
 public class AuthUserServiceImpl implements AuthUserService {
@@ -54,6 +56,23 @@ public class AuthUserServiceImpl implements AuthUserService {
 			throw new PassWordErrorException("密码不正确");
 		}
 		return true;
+
+	}
+
+	/**
+	 * 生成rsa密钥对
+	 */
+	@PostConstruct
+	public void generateKeyPairs() {
+
+		String[] keyPairs = RSAEncrypt.genKeyPair();
+
+		System.out.println("public key : " + keyPairs[0]);
+
+		System.out.println("private key : " + keyPairs[1]);
+
+		AuthCodeController.keyCache.put("publickey", keyPairs[0]);
+		AuthCodeController.keyCache.put("privatekey", keyPairs[1]);
 
 	}
 }

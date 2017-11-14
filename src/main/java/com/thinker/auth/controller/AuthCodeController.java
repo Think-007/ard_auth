@@ -3,7 +3,6 @@ package com.thinker.auth.controller;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -13,16 +12,15 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.convert.ReadingConverter;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.think.creator.domain.ProcessResult;
-import com.thinker.auth.util.ArdLog;
 import com.thinker.auth.util.Redis;
 import com.thinker.auth.util.SecurityCode;
 import com.thinker.auth.util.SecurityImage;
+import com.thinker.util.ArdLog;
 
 @RestController
 @RequestMapping("/auth/code")
@@ -30,6 +28,28 @@ public class AuthCodeController {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(AuthCodeController.class);
+	public static final HashMap<String, String> keyCache = new HashMap<String, String>();
+
+	@RequestMapping("/publickey")
+	public ProcessResult reqPublicKey() {
+
+		ProcessResult processResult = new ProcessResult();
+
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
+
+		String publicKey = keyCache.get("publickey");
+
+		if (publicKey != null) {
+
+			processResult.setRetCode(ProcessResult.SUCCESS);
+			processResult.setRetMsg("ok");
+			processResult.setRetObj(publicKey);
+		}
+
+		return processResult;
+
+	}
 
 	@RequestMapping(value = "/securcode", method = RequestMethod.GET)
 	public void generateSecureCode(HttpServletRequest request,
@@ -71,6 +91,8 @@ public class AuthCodeController {
 		ArdLog.debug(logger, "enter generateSmsCode", null, telNumber);
 
 		ProcessResult processResult = new ProcessResult();
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
 		String smsCode = "123456";
 		String clientType = request.getHeader("client");
 		if (clientType == null) {
@@ -84,7 +106,7 @@ public class AuthCodeController {
 
 		}
 
-		processResult.setRetCode(0);
+		processResult.setRetCode(ProcessResult.SUCCESS);
 		ArdLog.debug(logger, "finish generateSmsCode", null, "processResult: "
 				+ processResult);
 		return processResult;
@@ -102,6 +124,9 @@ public class AuthCodeController {
 		ArdLog.info(logger, "enter authSmsCode", null, smsCode);
 
 		ProcessResult processResult = new ProcessResult();
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
+
 		String code = (String) Redis.redis.get(telNumber);
 
 		// 校验短信验证码是否正确

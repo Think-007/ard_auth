@@ -1,4 +1,4 @@
-package com.thinker.auth.util;
+package com.thinker.util;
 
 public interface Sex {
 

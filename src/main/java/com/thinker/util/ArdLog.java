@@ -7,7 +7,7 @@
  * 2017年4月6日	| lipengfeia 	| 	create the file                       
  */
 
-package com.thinker.auth.util;
+package com.thinker.util;
 
 import org.slf4j.Logger;
 
@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 
 public final class ArdLog {
 
-	private static final String HEAD_INFO = "ARD-AUTH--------> :";
+	private static final String HEAD_INFO = "ARD--------> :";
 
 	private static final String MID_INFO = "   obj===:";
 
