@@ -2,7 +2,6 @@ package com.thinker.auth.controller;
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
-import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +20,7 @@ import com.thinker.auth.util.Redis;
 import com.thinker.auth.util.SecurityCode;
 import com.thinker.auth.util.SecurityImage;
 import com.thinker.util.ArdLog;
+import com.thinker.util.CacheUtil;
 
 @RestController
 @RequestMapping("/auth/code")
@@ -28,7 +28,6 @@ public class AuthCodeController {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(AuthCodeController.class);
-	public static final HashMap<String, String> keyCache = new HashMap<String, String>();
 
 	@RequestMapping("/publickey")
 	public ProcessResult reqPublicKey() {
@@ -38,7 +37,7 @@ public class AuthCodeController {
 		processResult.setRetCode(ProcessResult.FAILED);
 		processResult.setRetMsg("failed");
 
-		String publicKey = keyCache.get("publickey");
+		String publicKey = CacheUtil.keyCache.get("publickey");
 
 		if (publicKey != null) {
 

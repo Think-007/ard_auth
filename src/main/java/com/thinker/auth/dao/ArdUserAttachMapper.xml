@@ -18,8 +18,27 @@
 		#{headpicURL},
 		#{createTime}
 		)
-	
+
 	</insert>
+
+	<update id="updateUserAttach">
+		update ard_user_attach
+
+		<trim prefix="set" suffixOverrides=",">
+			<if test="telNum !=null and telNum != '' ">
+				telNum = #{telNum},
+			</if>
+			<if test="thumbURL !=null and thumbURL != '' ">
+				thumb_url = #{thumbURL},
+			</if>
+			<if test="headpicURL !=null and headpicURL != '' ">
+				headpic_url = #{headpicURL},
+			</if>
+		</trim>
+		where user_id = #{userId}
+
+
+	</update>
 
 
 	<!-- <select id="queryComissionCountAndSum" resultType="java.util.Map"> 

@@ -22,7 +22,6 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +43,7 @@ import com.thinker.auth.util.TokenUtil;
 import com.thinker.security.RSAEncrypt;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
-import com.thinker.util.JsonUtils;
+import com.thinker.util.CacheUtil;
 
 /**
  * 
@@ -91,8 +90,8 @@ public class GateController {
 
 		try {
 
-			// 解析用户登录信息密文
-			String[] userInfo = decryptReqStr(registInfo);
+			// 解析用户注册信息密文
+			String[] userInfo = authUserService.decryptReqStr(registInfo);
 
 			String telnum = userInfo[0];
 			String password = userInfo[1];
@@ -154,16 +153,6 @@ public class GateController {
 		return processResult;
 	}
 
-	private String[] decryptReqStr(String encryptStr) throws Exception {
-		String privateKey = AuthCodeController.keyCache.get("privateKey");
-		String userInfoStr = new String(RSAEncrypt.decrypt(
-				RSAEncrypt.loadPrivateKeyByStr(privateKey),
-				encryptStr.getBytes()));
-
-		String[] userInfo = userInfoStr.split("_");
-		return userInfo;
-	}
-
 	/**
 	 * 实际的登录代码 如果登录成功，跳转至首页；登录失败，则将失败信息反馈对用户
 	 * 
@@ -182,7 +171,7 @@ public class GateController {
 
 		try {
 			// 解析用户登录信息密文
-			String[] userInfo = decryptReqStr(loginInfo);
+			String[] userInfo = authUserService.decryptReqStr(loginInfo);
 			// 客户端公钥
 			String publicKey = key;
 
@@ -216,8 +205,7 @@ public class GateController {
 
 					// 3、存储token和用户信息
 
-					Redis.redis.put(loginToken,
-							JsonUtils.toJson(userInfoDetail));
+					Redis.redis.put(userInfoDetail.getUserId(), loginToken);
 
 				}
 
@@ -259,11 +247,22 @@ public class GateController {
 	 */
 	@RequestMapping(value = "/password_reset", method = RequestMethod.PUT)
 	public ProcessResult resetPassword(HttpServletRequest request,
-			HttpServletResponse response) {
+			HttpServletResponse response, String telNumber, String smsCode,
+			String newPassword) {
 
-		ProcessResult result = new ProcessResult();
+		ProcessResult processResult = new ProcessResult();
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
+		String code = (String) Redis.redis.get(telNumber);
+		if (code != null && code.equals(smsCode)) {
+			// 更改密码
 
-		return result;
+		} else {
+
+			processResult.setErrorCode(ArdError.SMS_CODE_ERROR);
+		}
+
+		return processResult;
 
 	}
 

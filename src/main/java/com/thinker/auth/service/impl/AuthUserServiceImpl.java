@@ -7,7 +7,6 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.thinker.auth.controller.AuthCodeController;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.exception.PassWordErrorException;
 import com.thinker.auth.exception.UserLockException;
@@ -15,6 +14,7 @@ import com.thinker.auth.exception.UserNotExistException;
 import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserInfoService;
 import com.thinker.security.RSAEncrypt;
+import com.thinker.util.CacheUtil;
 import com.thinker.util.UserStatus;
 
 @Service
@@ -71,8 +71,20 @@ public class AuthUserServiceImpl implements AuthUserService {
 
 		System.out.println("private key : " + keyPairs[1]);
 
-		AuthCodeController.keyCache.put("publickey", keyPairs[0]);
-		AuthCodeController.keyCache.put("privatekey", keyPairs[1]);
+		CacheUtil.keyCache.put("publickey", keyPairs[0]);
+		CacheUtil.keyCache.put("privatekey", keyPairs[1]);
 
 	}
+
+	@Override
+	public String[] decryptReqStr(String encryptStr) throws Exception {
+		String privateKey = CacheUtil.keyCache.get("privateKey");
+		String userInfoStr = new String(RSAEncrypt.decrypt(
+				RSAEncrypt.loadPrivateKeyByStr(privateKey),
+				encryptStr.getBytes()));
+
+		String[] userInfo = userInfoStr.split("_");
+		return userInfo;
+	}
+
 }

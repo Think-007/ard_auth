@@ -57,6 +57,44 @@
 
 	</select>
 
+	<update id="updateArdUser">
+		update ard_user
+
+		<trim prefix="set"  suffixOverrides=",">
+			<if test="password != null and password != '' ">
+				password=#{password},
+			</if>
+			<if test="salt != null and salt != '' ">
+				salt=#{salt},
+			</if>
+			<if test="sex != 0 ">
+				sex=#{sex},
+			</if>
+			<if test="level != 0 ">
+				level=#{level},
+			</if>
+			<if test="password != null and password != '' ">
+				password=#{password},
+			</if>
+			
+		</trim>
+		
+		where user_id=#{userId}
+
+	</update>
+
+	<update id="updateArdUserStatus">
+
+		update ard_user
+
+		set status = #{status}
+
+		where
+		user_id=#{userId}
+
+
+	</update>
+
 
 
 	<!-- <select id="queryComissionCountAndSum" resultType="java.util.Map"> 

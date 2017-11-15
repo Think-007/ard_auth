@@ -12,4 +12,12 @@ public interface ArdUserAttachMapper {
 	 */
 	public int insertUserAttach(ArdUserAttach ardUserAttach);
 
+	/**
+	 * 更具uid更新用户信息
+	 * 
+	 * @param ardUserAttach
+	 * @return
+	 */
+	public int updateUserAttach(ArdUserAttach ardUserAttach);
+
 }
