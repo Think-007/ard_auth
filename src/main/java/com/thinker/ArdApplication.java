@@ -13,7 +13,7 @@ import com.thinker.auth.dao.MysqlMapper;
 @EnableTransactionManagement
 @ServletComponentScan
 @MapperScan(basePackageClasses = { MysqlMapper.class })
-@ImportResource({ "classpath:redis/spring-redis-cluster.xml" })
+//@ImportResource({ "classpath:redis/spring-redis-cluster.xml" })
 public class ArdApplication {
 
 	public static void main(String[] args) {

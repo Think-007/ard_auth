@@ -41,8 +41,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Override
 	public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber) {
 
-		UserInfoDetail userInfoDetail = ardUserMapper
-				.queryArdUserDetailByTelNumber(telNumber);
+		UserInfoDetail userInfoDetail = ardUserMapper.queryArdUserDetailByTelNumber(telNumber);
 
 		return userInfoDetail;
 	}
@@ -51,6 +50,15 @@ public class UserInfoServiceImpl implements UserInfoService {
 	public int updateUserHeadPic(ArdUserAttach ardUserAttach) {
 
 		int result = ardUserAttachMapper.updateUserAttach(ardUserAttach);
+
+		return result;
+	}
+
+	@Override
+	public int updateUserInfo(ArdUser ardUser) {
+		// TODO Auto-generated method stub
+
+		int result = ardUserMapper.updateArdUser(ardUser);
 
 		return result;
 	}

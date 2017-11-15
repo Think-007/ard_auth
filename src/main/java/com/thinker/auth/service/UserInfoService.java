@@ -30,4 +30,12 @@ public interface UserInfoService {
 	 */
 	public int updateUserHeadPic(ArdUserAttach ardUserAttach);
 
+	/**
+	 * 更新用户信息
+	 * 
+	 * @param ardUser
+	 * @return
+	 */
+	public int updateUserInfo(ArdUser ardUser);
+
 }

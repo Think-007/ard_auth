@@ -1,6 +1,12 @@
 package com.thinker.auth.controller;
 
 import java.io.File;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -8,21 +14,37 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.coobird.thumbnailator.Thumbnails;
 
+import org.apache.shiro.crypto.hash.Md5Hash;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.think.creator.domain.ProcessResult;
+import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserAttach;
 import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.util.Redis;
 import com.thinker.util.ArdError;
+import com.thinker.util.ArdLog;
 
 @RestController
 @RequestMapping("/filter/auth")
 public class UserCenterController {
+
+	private static final Logger logger = LoggerFactory.getLogger(UserCenterController.class);
+
+	// 随机盐值
+	@Value("${shiro.salt}")
+	private String saltStr;
+	// 加盐次数
+	@Value("${salt.hashIterations}")
+	private int hashIterations;
 
 	@Resource
 	private UserInfoService userInfoService;
@@ -92,6 +114,7 @@ public class UserCenterController {
 			ardUserAttach.setUserId(userId);
 			ardUserAttach.setThumbURL(micPicPath);
 			ardUserAttach.setHeadpicURL(picPath);
+			ArdLog.info(logger, "setHeadPic", null, ardUserAttach);
 			userInfoService.updateUserHeadPic(ardUserAttach);
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
@@ -103,6 +126,7 @@ public class UserCenterController {
 			e.printStackTrace();
 		}
 
+		ArdLog.info(logger, "setHeadPic", null, processResult);
 		return processResult;
 	}
 
@@ -118,8 +142,9 @@ public class UserCenterController {
 	public ProcessResult checkOldPassword(HttpServletRequest request, HttpServletResponse response,
 			String oldPassword) {
 
-		ProcessResult result = new ProcessResult();
-
+		ProcessResult processResult = new ProcessResult();
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
 		try {
 			String[] reqInfo = authUserService.decryptReqStr(oldPassword);
 		} catch (Exception e) {
@@ -127,7 +152,7 @@ public class UserCenterController {
 			e.printStackTrace();
 		}
 
-		return result;
+		return processResult;
 
 	}
 
@@ -141,17 +166,36 @@ public class UserCenterController {
 	@RequestMapping(value = "/password/new", method = RequestMethod.PUT)
 	public ProcessResult changePassword(HttpServletRequest request, HttpServletResponse response, String newPassword) {
 
-		ProcessResult result = new ProcessResult();
+		ArdLog.info(logger, "enter changePassword", null, newPassword);
+		ProcessResult processResult = new ProcessResult();
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
 
 		try {
+			String userId = (String) request.getAttribute("uid");
 			String[] reqInfo = authUserService.decryptReqStr(newPassword);
 
+			System.out.println(reqInfo.length + reqInfo[0]);
+			Md5Hash mh = new Md5Hash(reqInfo[0], saltStr, hashIterations);
+			ArdUser ardUser = new ArdUser();
+			ardUser.setUserId(userId);
+			ardUser.setPassword(mh.toString());
+			userInfoService.updateUserInfo(ardUser);
+
+			processResult.setRetCode(ProcessResult.SUCCESS);
+			processResult.setRetMsg("ok");
+
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+
+			processResult.setErrorCode(ArdError.EXCEPTION);
+			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
+			ArdLog.error(logger, "changePassword", null, null, e);
 			e.printStackTrace();
 		}
 
-		return result;
+		ArdLog.info(logger, "changePassword", null, processResult);
+
+		return processResult;
 
 	}
 
@@ -185,6 +229,57 @@ public class UserCenterController {
 		// app还要删除token
 		Redis.redis.remove(uid);
 
+	}
+
+	/**
+	 * 解绑手机号码
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("/unbind")
+	public ProcessResult unbindTelNumber(HttpServletRequest request, HttpServletResponse response,
+			String telNumber) {
+
+		ProcessResult result = new ProcessResult();
+		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
+
+		Enumeration<String> paramNames = request.getAttributeNames();
+
+		while (paramNames.hasMoreElements()) {
+			String paramName = paramNames.nextElement();
+
+			if (paramName.equals("sign")) {
+				continue;
+			}
+
+			System.out.println(paramName);
+
+			String paramValues = (String) request.getAttribute(paramName);
+
+			System.out.println(paramValues);
+
+			paramsMap.put(paramName, paramValues);
+
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		Set es = paramsMap.entrySet();
+		Iterator it = es.iterator();
+		while (it.hasNext()) {
+			Map.Entry entry = (Map.Entry) it.next();
+			String k = (String) entry.getKey();
+			String v = (String) entry.getValue();
+			if (null != v && !"".equals(v)) {
+				sb.append(k + "=" + v + "&");
+			}
+		}
+		sb.append("token=" + "ss");
+		System.out.println("服务端签名" + sb.toString());
+
+		return result;
 	}
 
 }
