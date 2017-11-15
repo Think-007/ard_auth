@@ -2,6 +2,8 @@ package com.thinker.auth.dao;
 
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.UserInfoDetail;
 
@@ -30,6 +32,24 @@ public interface ArdUserMapper {
 	 * @return
 	 */
 	public UserInfoDetail queryArdUserDetailByTelNumber(String telNumber);
+
+	/**
+	 * 根据uid更新用户信息
+	 * 
+	 * @param ardUser
+	 * @return
+	 */
+	public int updateArdUser(ArdUser ardUser);
+
+	/**
+	 * 根据uid更新用户账号状态
+	 * 
+	 * @param userId
+	 * @param status
+	 * @return
+	 */
+	public int updateArdUserStatus(@Param("userId") String userId,
+			@Param("status") int status);
 
 	// public int deleteArdUser(ArdUser ardUser);
 	//

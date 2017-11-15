@@ -19,11 +19,27 @@ public class ArdUserMapperTest {
 	private ArdUserMapper ardUserMapper;
 
 	@Test
-	public void test() {
+	public void insert() {
 		ArdUser ardUser = new ArdUser();
 		ardUser.setUserId("fsdafasd ");
+		ardUser.setPassword("1111");
 		ardUser.setCreateTime(Calendar.getInstance().getTime());
 		ardUserMapper.insertArdUser(ardUser);
+	}
+
+	@Test
+	public void update() {
+		ArdUser ardUser = new ArdUser();
+		ardUser.setUserId("fsdafasd");
+		ardUser.setPassword("fddddddddddddsafd");
+
+		ardUserMapper.updateArdUser(ardUser);
+	}
+
+	@Test
+	public void updateStatus() {
+
+		ardUserMapper.updateArdUserStatus("fsdafasd", 4);
 	}
 
 }

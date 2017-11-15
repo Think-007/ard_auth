@@ -1,20 +1,34 @@
 package com.thinker.auth.controller;
 
+import java.io.File;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.web.bind.annotation.PathVariable;
+import net.coobird.thumbnailator.Thumbnails;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.think.creator.domain.ProcessResult;
+import com.thinker.auth.domain.ArdUserAttach;
+import com.thinker.auth.service.AuthUserService;
+import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.util.Redis;
+import com.thinker.util.ArdError;
 
 @RestController
 @RequestMapping("/filter/auth")
 public class UserCenterController {
+
+	@Resource
+	private UserInfoService userInfoService;
+	// 用户登录鉴权业务
+	@Resource
+	private AuthUserService authUserService;
 
 	// @RequestMapping("/signin/{uid}/{timestamp}")
 	// public ProcessResult singnIn() {
@@ -32,6 +46,29 @@ public class UserCenterController {
 	@RequestMapping(value = "/headpic", method = RequestMethod.POST)
 	public ProcessResult uploadPic(MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
 
+		String filePath = "D:/upload/users/imgs/";
+		// 获取图片原始名称
+		String originalFilename = file.getOriginalFilename();
+		// 图片扩展名
+		String types = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+
+		String uid = (String) request.getAttribute("uid");
+
+		try {
+			System.out.println(types);
+			// 以用户id加图片扩展名给图片命名
+			String newFileName = uid + "." + types;
+			File picfile = new File(filePath + "uid/" + newFileName);
+			File micPicFile = new File(filePath + "uid/mic/" + newFileName);
+			// 上传
+			// 以80*80大小改变图片，此处使用thumbnailator-0.4.2.jar改变图片大小
+			Thumbnails.of(picfile).scale(1f).outputQuality(0.25f).toFile(picfile);
+
+			Thumbnails.of(picfile).size(80, 80).keepAspectRatio(false).toFile(micPicFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 
@@ -42,10 +79,31 @@ public class UserCenterController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping("/user_head/")
-	public ProcessResult setHeadPic(String picPath, String micPicPath) {
+	@RequestMapping("/user_head")
+	public ProcessResult setHeadPic(HttpServletRequest request, HttpServletResponse response, String picPath,
+			String micPicPath) {
+		ProcessResult processResult = new ProcessResult();
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
 
-		return null;
+		try {
+			String userId = (String) request.getAttribute("uid");
+			ArdUserAttach ardUserAttach = new ArdUserAttach();
+			ardUserAttach.setUserId(userId);
+			ardUserAttach.setThumbURL(micPicPath);
+			ardUserAttach.setHeadpicURL(picPath);
+			userInfoService.updateUserHeadPic(ardUserAttach);
+			processResult.setRetCode(ProcessResult.SUCCESS);
+			processResult.setRetMsg("ok");
+
+		} catch (Exception e) {
+
+			processResult.setErrorCode(ArdError.EXCEPTION);
+			processResult.setErrorDesc(ArdError.EXCEPTION_MSG);
+			e.printStackTrace();
+		}
+
+		return processResult;
 	}
 
 	/**
@@ -62,6 +120,13 @@ public class UserCenterController {
 
 		ProcessResult result = new ProcessResult();
 
+		try {
+			String[] reqInfo = authUserService.decryptReqStr(oldPassword);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return result;
 
 	}
@@ -77,6 +142,14 @@ public class UserCenterController {
 	public ProcessResult changePassword(HttpServletRequest request, HttpServletResponse response, String newPassword) {
 
 		ProcessResult result = new ProcessResult();
+
+		try {
+			String[] reqInfo = authUserService.decryptReqStr(newPassword);
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return result;
 
@@ -108,9 +181,9 @@ public class UserCenterController {
 	@RequestMapping(value = "/out", method = RequestMethod.POST)
 	public void checkOut(HttpServletRequest request, HttpServletResponse response) {
 
-		String token = request.getHeader("token");
+		String uid = request.getHeader("uid");
 		// app还要删除token
-		Redis.redis.remove(token);
+		Redis.redis.remove(uid);
 
 	}
 

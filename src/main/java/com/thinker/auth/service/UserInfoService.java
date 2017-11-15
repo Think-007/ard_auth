@@ -1,6 +1,7 @@
 package com.thinker.auth.service;
 
 import com.thinker.auth.domain.ArdUser;
+import com.thinker.auth.domain.ArdUserAttach;
 import com.thinker.auth.domain.UserInfoDetail;
 
 public interface UserInfoService {
@@ -20,5 +21,13 @@ public interface UserInfoService {
 	 * @return
 	 */
 	public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber);
+
+	/**
+	 * 根据uid更新头像信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public int updateUserHeadPic(ArdUserAttach ardUserAttach);
 
 }

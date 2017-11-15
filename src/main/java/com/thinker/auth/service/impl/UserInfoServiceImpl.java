@@ -19,6 +19,9 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Resource
 	private ArdUserMapper ardUserMapper;
 
+	@Resource
+	private ArdUserAttachMapper ardUserAttachMapper;
+
 	// // 用户附属信息查询
 	// @Resource
 	// private ArdUserAttachMapper ardUserAttachMapper;
@@ -42,5 +45,13 @@ public class UserInfoServiceImpl implements UserInfoService {
 				.queryArdUserDetailByTelNumber(telNumber);
 
 		return userInfoDetail;
+	}
+
+	@Override
+	public int updateUserHeadPic(ArdUserAttach ardUserAttach) {
+
+		int result = ardUserAttachMapper.updateUserAttach(ardUserAttach);
+
+		return result;
 	}
 }
