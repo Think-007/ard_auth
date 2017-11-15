@@ -105,8 +105,8 @@ public class UserCenterController {
 	 * @param response
 	 * @param uid
 	 */
-	@RequestMapping(value = "/out/{uid}/{timestamp}", method = RequestMethod.POST)
-	public void checkOut(HttpServletRequest request, HttpServletResponse response, String uid) {
+	@RequestMapping(value = "/out", method = RequestMethod.POST)
+	public void checkOut(HttpServletRequest request, HttpServletResponse response) {
 
 		String token = request.getHeader("token");
 		// app还要删除token
