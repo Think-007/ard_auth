@@ -1,12 +1,9 @@
 package com.thinker.auth.controller;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +15,9 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +34,8 @@ import com.thinker.util.ArdLog;
 @RequestMapping("/filter/auth")
 public class UserCenterController {
 
-	private static final Logger logger = LoggerFactory.getLogger(UserCenterController.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(UserCenterController.class);
 
 	// 随机盐值
 	@Value("${shiro.salt}")
@@ -66,32 +64,71 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping(value = "/headpic", method = RequestMethod.POST)
-	public ProcessResult uploadPic(MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
+	public ProcessResult uploadPic(@RequestParam("file") MultipartFile file,
+			HttpServletRequest request, HttpServletResponse response) {
 
-		String filePath = "D:/upload/users/imgs/";
+		ProcessResult processResult = new ProcessResult();
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
+
+		String uid = Math.random() * 1000 + "";
+
 		// 获取图片原始名称
 		String originalFilename = file.getOriginalFilename();
 		// 图片扩展名
-		String types = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+		String types = originalFilename.substring(
+				originalFilename.lastIndexOf(".") + 1).toLowerCase();
+		String newFileName = uid + "." + types;
+		String filePath = "D:/upload/users/imgs/" + uid + "/";
 
-		String uid = (String) request.getAttribute("uid");
-
+		BufferedOutputStream out = null;
 		try {
-			System.out.println(types);
-			// 以用户id加图片扩展名给图片命名
-			String newFileName = uid + "." + types;
-			File picfile = new File(filePath + "uid/" + newFileName);
-			File micPicFile = new File(filePath + "uid/mic/" + newFileName);
-			// 上传
-			// 以80*80大小改变图片，此处使用thumbnailator-0.4.2.jar改变图片大小
-			Thumbnails.of(picfile).scale(1f).outputQuality(0.25f).toFile(picfile);
 
-			Thumbnails.of(picfile).size(80, 80).keepAspectRatio(false).toFile(micPicFile);
+			File fileDir = new File(filePath);
+			if (!fileDir.exists()) {
+				fileDir.mkdirs();
+			}
+
+			// 以用户id加图片扩展名给图片命名
+			File originfile = new File(filePath + "origin_" + originalFilename);
+			File picfile = new File(filePath + "big_" + newFileName);
+			File micPicFile = new File(filePath + "mic_" + newFileName);
+
+			System.out.println(originfile.toString());
+			if (!originfile.exists()) {
+				originfile.createNewFile();
+			}
+			if (!picfile.exists()) {
+				picfile.createNewFile();
+			}
+			if (!micPicFile.exists()) {
+				micPicFile.createNewFile();
+			}
+			// 保存原始图片、压缩图片和微缩图片
+			out = new BufferedOutputStream(new FileOutputStream(originfile));
+			out.write(file.getBytes());
+			out.flush();
+			out.close();
+			Thumbnails.of(originfile).scale(1f).outputQuality(0.25f)
+					.toFile(picfile);
+			Thumbnails.of(originfile).size(80, 80).keepAspectRatio(false)
+					.toFile(micPicFile);
+
 		} catch (Exception e) {
+			processResult.setErrorCode(ArdError.EXCEPTION);
+			processResult.setErrorDesc(ArdError.EXCEPTION_MSG);
+			ArdLog.error(logger, "uploadPic", null, null, e);
 			e.printStackTrace();
+		} finally {
+			try {
+				out.close();
+			} catch (IOException e) {
+				ArdLog.error(logger, "uploadPic", null, null, e);
+				e.printStackTrace();
+			}
 		}
 
-		return null;
+		return processResult;
 	}
 
 	/**
@@ -102,8 +139,8 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping("/user_head")
-	public ProcessResult setHeadPic(HttpServletRequest request, HttpServletResponse response, String picPath,
-			String micPicPath) {
+	public ProcessResult setHeadPic(HttpServletRequest request,
+			HttpServletResponse response, String picPath, String micPicPath) {
 		ProcessResult processResult = new ProcessResult();
 		processResult.setRetCode(ProcessResult.FAILED);
 		processResult.setRetMsg("failed");
@@ -123,6 +160,7 @@ public class UserCenterController {
 
 			processResult.setErrorCode(ArdError.EXCEPTION);
 			processResult.setErrorDesc(ArdError.EXCEPTION_MSG);
+			ArdLog.error(logger, "user_head", null, null, e);
 			e.printStackTrace();
 		}
 
@@ -139,19 +177,43 @@ public class UserCenterController {
 	 */
 
 	@RequestMapping(value = "/password/old", method = RequestMethod.GET)
-	public ProcessResult checkOldPassword(HttpServletRequest request, HttpServletResponse response,
-			String oldPassword) {
+	public ProcessResult checkOldPassword(HttpServletRequest request,
+			HttpServletResponse response, String oldPassword) {
 
+		ArdLog.info(logger, "checkOldPassword", null, "oldPassword : "
+				+ oldPassword);
 		ProcessResult processResult = new ProcessResult();
 		processResult.setRetCode(ProcessResult.FAILED);
 		processResult.setRetMsg("failed");
 		try {
+			// 解析用户 就密码
+			String userId = (String) request.getAttribute("uid");
 			String[] reqInfo = authUserService.decryptReqStr(oldPassword);
+			System.out.println(reqInfo.length + reqInfo[0]);
+
+			// 1.根据uid查询用户信息
+			ArdUser ardUser = userInfoService.getUserInfoByuserId(userId);
+			if (ardUser != null) {
+
+				Md5Hash mh = new Md5Hash(reqInfo[0], ardUser.getSalt(),
+						hashIterations);
+				// 2.判断就密码是否正确
+				if (mh.toString().equals(ardUser.getPassword())) {
+					processResult.setRetCode(ProcessResult.SUCCESS);
+					processResult.setRetMsg("ok");
+				}
+
+			}
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+
+			processResult.setErrorCode(ArdError.EXCEPTION);
+			processResult.setErrorDesc(ArdError.EXCEPTION_MSG);
+			ArdLog.error(logger, "checkOldPassword", null, null, e);
 			e.printStackTrace();
 		}
-
+		ArdLog.info(logger, "checkOldPassword", null, processResult);
 		return processResult;
 
 	}
@@ -164,7 +226,8 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping(value = "/password/new", method = RequestMethod.PUT)
-	public ProcessResult changePassword(HttpServletRequest request, HttpServletResponse response, String newPassword) {
+	public ProcessResult changePassword(HttpServletRequest request,
+			HttpServletResponse response, String newPassword) {
 
 		ArdLog.info(logger, "enter changePassword", null, newPassword);
 		ProcessResult processResult = new ProcessResult();
@@ -172,7 +235,8 @@ public class UserCenterController {
 		processResult.setRetMsg("failed");
 
 		try {
-			String userId = (String) request.getAttribute("uid");
+			// 解析用户参数
+			String userId = (String) request.getHeader("uid");
 			String[] reqInfo = authUserService.decryptReqStr(newPassword);
 
 			System.out.println(reqInfo.length + reqInfo[0]);
@@ -180,6 +244,8 @@ public class UserCenterController {
 			ArdUser ardUser = new ArdUser();
 			ardUser.setUserId(userId);
 			ardUser.setPassword(mh.toString());
+
+			// 跟新密码为新的密码
 			userInfoService.updateUserInfo(ardUser);
 
 			processResult.setRetCode(ProcessResult.SUCCESS);
@@ -207,12 +273,31 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping(value = "/telnumber", method = RequestMethod.PUT)
-	public ProcessResult resetTelnumber(HttpServletRequest request, HttpServletResponse response) {
+	public ProcessResult resetTelnumber(HttpServletRequest request,
+			HttpServletResponse response, String telNumber, String smsCode) {
 
 		ProcessResult result = new ProcessResult();
 
 		return result;
 
+	}
+
+	@RequestMapping(value = "/username", method = RequestMethod.POST)
+	public ProcessResult modifyUserName(HttpServletRequest request,
+			HttpServletResponse response, String userName) {
+
+		String userId = request.getHeader("uid");
+
+		try {
+			userInfoService.updateUserBm(userId, userName);
+		}
+
+		catch (Throwable t) {
+			// TODO Auto-generated catch block
+			t.printStackTrace();
+		}
+
+		return null;
 	}
 
 	/**
@@ -223,7 +308,8 @@ public class UserCenterController {
 	 * @param uid
 	 */
 	@RequestMapping(value = "/out", method = RequestMethod.POST)
-	public void checkOut(HttpServletRequest request, HttpServletResponse response) {
+	public void checkOut(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		String uid = request.getHeader("uid");
 		// app还要删除token
@@ -239,45 +325,10 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping("/unbind")
-	public ProcessResult unbindTelNumber(HttpServletRequest request, HttpServletResponse response,
-			String telNumber) {
+	public ProcessResult unbindTelNumber(HttpServletRequest request,
+			HttpServletResponse response, String telNumber) {
 
 		ProcessResult result = new ProcessResult();
-		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
-
-		Enumeration<String> paramNames = request.getAttributeNames();
-
-		while (paramNames.hasMoreElements()) {
-			String paramName = paramNames.nextElement();
-
-			if (paramName.equals("sign")) {
-				continue;
-			}
-
-			System.out.println(paramName);
-
-			String paramValues = (String) request.getAttribute(paramName);
-
-			System.out.println(paramValues);
-
-			paramsMap.put(paramName, paramValues);
-
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		Set es = paramsMap.entrySet();
-		Iterator it = es.iterator();
-		while (it.hasNext()) {
-			Map.Entry entry = (Map.Entry) it.next();
-			String k = (String) entry.getKey();
-			String v = (String) entry.getValue();
-			if (null != v && !"".equals(v)) {
-				sb.append(k + "=" + v + "&");
-			}
-		}
-		sb.append("token=" + "ss");
-		System.out.println("服务端签名" + sb.toString());
 
 		return result;
 	}

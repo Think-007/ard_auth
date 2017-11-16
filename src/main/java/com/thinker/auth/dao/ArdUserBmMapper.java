@@ -28,4 +28,12 @@ public interface ArdUserBmMapper {
 	// 创建用户名
 	public int insertUserBm(ArdUserBm ardUserBm);
 
+	/**
+	 * 更改用户名
+	 * 
+	 * @param ardUserBm
+	 * @return
+	 */
+	public int updateUseBm(ArdUserBm ardUserBm);
+
 }

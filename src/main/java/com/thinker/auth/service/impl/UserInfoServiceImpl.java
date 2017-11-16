@@ -9,6 +9,7 @@ import com.thinker.auth.dao.ArdUserBmMapper;
 import com.thinker.auth.dao.ArdUserMapper;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserAttach;
+import com.thinker.auth.domain.ArdUserBm;
 import com.thinker.auth.domain.UserInfoDetail;
 import com.thinker.auth.service.UserInfoService;
 
@@ -19,8 +20,13 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Resource
 	private ArdUserMapper ardUserMapper;
 
+	// 用户附加信息
 	@Resource
 	private ArdUserAttachMapper ardUserAttachMapper;
+
+	// 用户别名设置
+	@Resource
+	private ArdUserBmMapper ardUserBmMapper;
 
 	// // 用户附属信息查询
 	// @Resource
@@ -41,7 +47,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Override
 	public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber) {
 
-		UserInfoDetail userInfoDetail = ardUserMapper.queryArdUserDetailByTelNumber(telNumber);
+		UserInfoDetail userInfoDetail = ardUserMapper
+				.queryArdUserDetailByTelNumber(telNumber);
 
 		return userInfoDetail;
 	}
@@ -60,6 +67,23 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 		int result = ardUserMapper.updateArdUser(ardUser);
 
+		return result;
+	}
+
+	@Override
+	public ArdUser getUserInfoByuserId(String userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int updateUserBm(String userId, String userName) throws Exception {
+		// TODO Auto-generated method stub
+
+		ArdUserBm bm = new ArdUserBm();
+		bm.setUserId(userId);
+		bm.setUserName(userName);
+		int result = ardUserBmMapper.updateUseBm(bm);
 		return result;
 	}
 }

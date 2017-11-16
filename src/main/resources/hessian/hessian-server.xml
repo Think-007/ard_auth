@@ -9,10 +9,10 @@
            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd"
 	default-lazy-init="false">
 
-	<bean name="/NameFacade"
+<!-- 	<bean name="/NameFacade"
 		class="org.springframework.remoting.caucho.HessianServiceExporter">
 		<property name="serviceInterface" value="com.think.boot.facade.NameFacade" />
 		<property name="service" ref="nameFacadeImpl" />
-	</bean>
+	</bean> -->
 
 </beans>

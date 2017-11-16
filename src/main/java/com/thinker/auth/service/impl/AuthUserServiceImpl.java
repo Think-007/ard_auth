@@ -4,9 +4,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.shiro.crypto.hash.Md5Hash;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.thinker.auth.controller.AuthCodeController;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.exception.PassWordErrorException;
 import com.thinker.auth.exception.UserLockException;
@@ -14,12 +17,14 @@ import com.thinker.auth.exception.UserNotExistException;
 import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserInfoService;
 import com.thinker.security.RSAEncrypt;
+import com.thinker.util.ArdLog;
 import com.thinker.util.CacheUtil;
 import com.thinker.util.UserStatus;
 
 @Service
 public class AuthUserServiceImpl implements AuthUserService {
-
+	private static final Logger logger = LoggerFactory
+			.getLogger(AuthUserServiceImpl.class);
 	// 加盐次数
 	@Value("${salt.hashIterations}")
 	private int hashIterations;
@@ -78,6 +83,8 @@ public class AuthUserServiceImpl implements AuthUserService {
 
 	@Override
 	public String[] decryptReqStr(String encryptStr) throws Exception {
+
+		ArdLog.info(logger, "decryptReqStr", null, "密文 ： " + encryptStr);
 		String privateKey = CacheUtil.keyCache.get("privateKey");
 		String userInfoStr = new String(RSAEncrypt.decrypt(
 				RSAEncrypt.loadPrivateKeyByStr(privateKey),

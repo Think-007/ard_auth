@@ -40,6 +40,18 @@
 
 	</update>
 
+	<select id="queryUserAttachByTelNum" resultType="ArdUserAttach">
+		select
+		user_id as userId,
+		tel_num as telNum,
+		thumb_url as thumbURL,
+		headpic_url as headpicURL
+		from ard_user_attach
+
+		where tel_num = #{telNumber};
+
+	</select>
+
 
 	<!-- <select id="queryComissionCountAndSum" resultType="java.util.Map"> 
 		select count(*) as count, ifnull(sum(amount),0) as sumAmount from comission_record 

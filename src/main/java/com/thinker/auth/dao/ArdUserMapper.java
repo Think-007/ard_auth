@@ -26,6 +26,14 @@ public interface ArdUserMapper {
 	public ArdUser queryArdUserByTelNumber(String telNumber);
 
 	/**
+	 * 根据useId查询用户信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public ArdUser queryArdUserByuserId(String userId);
+
+	/**
 	 * 根据电话号码查询用户详情
 	 * 
 	 * @param telNumber

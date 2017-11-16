@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.think.creator.domain.ProcessResult;
 import com.thinker.auth.util.Redis;
 import com.thinker.auth.util.SecurityCode;
 import com.thinker.auth.util.SecurityImage;
+import com.thinker.creator.domain.ProcessResult;
+import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
 import com.thinker.util.CacheUtil;
 
@@ -33,9 +34,6 @@ public class AuthCodeController {
 	public ProcessResult reqPublicKey() {
 
 		ProcessResult processResult = new ProcessResult();
-
-		processResult.setRetCode(ProcessResult.FAILED);
-		processResult.setRetMsg("failed");
 
 		String publicKey = CacheUtil.keyCache.get("publickey");
 
@@ -90,8 +88,6 @@ public class AuthCodeController {
 		ArdLog.debug(logger, "enter generateSmsCode", null, telNumber);
 
 		ProcessResult processResult = new ProcessResult();
-		processResult.setRetCode(ProcessResult.FAILED);
-		processResult.setRetMsg("failed");
 		String smsCode = "123456";
 		String clientType = request.getHeader("client");
 		if (clientType == null) {
@@ -102,6 +98,7 @@ public class AuthCodeController {
 		} else {
 
 			Redis.redis.put(telNumber, smsCode);
+			Redis.redis.put(telNumber + "_auth", smsCode);
 
 		}
 
@@ -123,8 +120,6 @@ public class AuthCodeController {
 		ArdLog.info(logger, "enter authSmsCode", null, smsCode);
 
 		ProcessResult processResult = new ProcessResult();
-		processResult.setRetCode(ProcessResult.FAILED);
-		processResult.setRetMsg("failed");
 
 		String code = (String) Redis.redis.get(telNumber);
 
@@ -134,8 +129,8 @@ public class AuthCodeController {
 			processResult.setRetMsg("ok");
 			Redis.redis.remove(telNumber);
 		} else {
-			processResult.setRetCode(ProcessResult.FAILED);
-			processResult.setRetMsg("failed");
+			processResult.setRetCode(ArdError.SMS_CODE_ERROR);
+			processResult.setRetMsg("验证码错误");
 		}
 		ArdLog.info(logger, "finish authSmsCode", null, processResult);
 		return processResult;

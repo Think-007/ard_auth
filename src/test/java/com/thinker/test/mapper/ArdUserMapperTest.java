@@ -42,4 +42,13 @@ public class ArdUserMapperTest {
 		ardUserMapper.updateArdUserStatus("fsdafasd", 4);
 	}
 
+	@Test
+	public void queryArdUserByuserId() {
+
+		ArdUser a = ardUserMapper.queryArdUserByuserId("fsdafasd ");
+
+		System.out.println(a);
+
+	}
+
 }

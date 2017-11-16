@@ -2,6 +2,7 @@ package com.thinker.auth.service;
 
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserAttach;
+import com.thinker.auth.domain.ArdUserBm;
 import com.thinker.auth.domain.UserInfoDetail;
 
 public interface UserInfoService {
@@ -37,5 +38,23 @@ public interface UserInfoService {
 	 * @return
 	 */
 	public int updateUserInfo(ArdUser ardUser);
+
+	/**
+	 * 根据uid查询用户信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public ArdUser getUserInfoByuserId(String userId);
+
+	/**
+	 * 根据uid更新别名
+	 * 
+	 * @param userId
+	 * @param userName
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateUserBm(String userId, String userName) throws Exception;
 
 }

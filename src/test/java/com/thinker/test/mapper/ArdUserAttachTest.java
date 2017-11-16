@@ -20,10 +20,18 @@ public class ArdUserAttachTest {
 	public void test() {
 
 		ArdUserAttach a = new ArdUserAttach();
-		a.setUserId(450190.4826065154+"");
+		a.setUserId(450190.4826065154 + "");
 		a.setHeadpicURL("ffafasf");
 		mapper.updateUserAttach(a);
+
+	}
+
+	@Test
+	public void queryUserAttachByTelNum() {
 		
+		ArdUserAttach a = mapper.queryUserAttachByTelNum("18201410900");
+
+		System.out.println(a);
 
 	}
 }

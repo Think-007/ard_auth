@@ -15,14 +15,13 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.think.creator.domain.ProcessResult;
 import com.thinker.auth.util.Redis;
+import com.thinker.creator.domain.ProcessResult;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
 import com.thinker.util.MD5Util;
@@ -33,7 +32,7 @@ import com.thinker.util.MD5Util;
  * @author lipengfeia
  *
  */
-//@WebFilter(filterName = "usercenter", urlPatterns = "/filter/*")
+// @WebFilter(filterName = "usercenter", urlPatterns = "/**/filter/*")
 public class UserInfoFilter implements Filter {
 
 	private static final Logger logger = LoggerFactory
@@ -54,8 +53,6 @@ public class UserInfoFilter implements Filter {
 
 		System.out.println("进入token拦截器");
 		ProcessResult processResult = new ProcessResult();
-		processResult.setRetCode(ProcessResult.FAILED);
-		processResult.setRetMsg("failed");
 		String uid = request.getHeader("uid");
 
 		String token = (String) Redis.redis.get(uid);
@@ -64,9 +61,8 @@ public class UserInfoFilter implements Filter {
 
 			System.out.println("token 不存在");
 
-
-			processResult.setErrorCode(ArdError.TOKEN_TIME_OUT);
-			processResult.setErrorDesc("token 过期");
+			processResult.setRetCode(ArdError.TOKEN_TIME_OUT);
+			processResult.setRetMsg("token 过期");
 
 			request.setAttribute("processResult", processResult);
 
@@ -78,8 +74,8 @@ public class UserInfoFilter implements Filter {
 
 			System.out.println("签名不合法");
 
-			processResult.setErrorCode(ArdError.PARAM_ILLEGAL);
-			processResult.setErrorDesc("签名不合法");
+			processResult.setRetCode(ArdError.PARAM_ILLEGAL);
+			processResult.setRetMsg("签名不合法");
 
 			request.setAttribute("processResult", processResult);
 
@@ -88,7 +84,7 @@ public class UserInfoFilter implements Filter {
 			requestDispatcher.forward(arg0, arg1);
 
 		} else {
-			
+
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
 			arg2.doFilter(arg0, arg1);
@@ -106,7 +102,7 @@ public class UserInfoFilter implements Filter {
 	private boolean authSign(HttpServletRequest request, String token) {
 		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
 
-		Enumeration<String> paramNames = request.getAttributeNames();
+		Enumeration<String> paramNames = request.getParameterNames();
 
 		while (paramNames.hasMoreElements()) {
 			String paramName = paramNames.nextElement();
@@ -117,7 +113,7 @@ public class UserInfoFilter implements Filter {
 
 			System.out.println(paramName);
 
-			String paramValues = (String) request.getAttribute(paramName);
+			String paramValues = (String) request.getParameter(paramName);
 
 			System.out.println(paramValues);
 
@@ -138,13 +134,13 @@ public class UserInfoFilter implements Filter {
 			}
 		}
 		sb.append("token=" + token);
-		System.out.println("服务端签名" + sb.toString());
+		System.out.println("服务端签名 : " + sb.toString());
 		ArdLog.info(logger, "url filter", null, "待签名数据= : " + sb.toString());
 		String sign = MD5Util.MD5Encode(sb.toString(), "UTF-8");
 
 		String reqSign = (String) request.getAttribute("sign");
 
-		System.out.println("请求端签名" + reqSign);
+		System.out.println("请求端签名 : " + reqSign);
 		ArdLog.info(logger, "url filter", null, "请求中的签名数据= : " + reqSign);
 
 		return sign.equalsIgnoreCase(reqSign);

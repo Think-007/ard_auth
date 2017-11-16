@@ -9,14 +9,12 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.think.creator.domain.ProcessResult;
-import com.thinker.auth.controller.AuthCodeController;
+import com.thinker.creator.domain.ProcessResult;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
 
@@ -40,16 +38,14 @@ public class URLFilter implements Filter {
 
 		System.out.println("进入url拦截器");
 		ProcessResult processResult = new ProcessResult();
-		processResult.setRetCode(ProcessResult.FAILED);
-		processResult.setRetMsg("failed");
-		String timeStamp = request.getHeader("timeStamp");
+		String timeStamp = request.getParameter("timeStamp");
 
 		if (System.currentTimeMillis() - Long.parseLong(timeStamp) > 600 * 1000) {
 
 			System.out.println("url 过期");
 
-			processResult.setErrorCode(ArdError.URL_TIME_OUT);
-			processResult.setErrorDesc("url 过期");
+			processResult.setRetCode(ArdError.URL_TIME_OUT);
+			processResult.setRetMsg("url 过期");
 			request.setAttribute("processResult", processResult);
 
 			RequestDispatcher requestDispatcher = request

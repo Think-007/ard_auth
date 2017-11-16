@@ -10,8 +10,13 @@
 package com.thinker.auth.controller;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
@@ -27,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.think.creator.domain.ProcessResult;
+import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserRole;
 import com.thinker.auth.domain.UserInfoDetail;
 import com.thinker.auth.domain.UserRegistParam;
@@ -82,11 +88,20 @@ public class GateController {
 	@Resource
 	private UserInfoService userInfoService;
 
+	/**
+	 * 用户注册接口 手机号_密码_昵称
+	 * 
+	 * @param registInfo
+	 * @param smsCode
+	 * @return
+	 */
 	@RequestMapping(value = "/registration", method = RequestMethod.POST)
 	public ProcessResult registUser(String registInfo, String smsCode) {
 		ArdLog.info(logger, "enter registUser ", null, "userRegistParam: "
 				+ registInfo + "smsCode: " + smsCode);
 		ProcessResult processResult = new ProcessResult();
+		processResult.setRetCode(ProcessResult.FAILED);
+		processResult.setRetMsg("failed");
 
 		try {
 
@@ -95,14 +110,21 @@ public class GateController {
 
 			String telnum = userInfo[0];
 			String password = userInfo[1];
-			String userName = userInfo[3];
+			String userName = userInfo[2];
 
 			UserRegistParam userRegistParam = new UserRegistParam();
 			userRegistParam.setTelNumber(telnum);
 			userRegistParam.setPassword(password);
 			userRegistParam.setUserName(userName);
 
-			// 1.校验参数
+			// 1.校验登录信息
+			String redisSmsCode = (String) Redis.redis.get(telnum + "_auth");
+
+			if (smsCode == null || !smsCode.equals(redisSmsCode)) {
+
+				processResult.setErrorCode(ArdError.SMS_CODE_ERROR);
+				return processResult;
+			}
 
 			// 2.密码加盐
 
@@ -121,27 +143,27 @@ public class GateController {
 			ArdUserRole ardUserRole = new ArdUserRole();
 
 			userRegistService.regitsUser(userRegistParam, saltStr, ardUserRole);
-
+			// 删除smscode
+			Redis.redis.remove(telnum + "_auth");
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
 		} catch (UserNameRepeatException e) {
 
-			processResult.setRetCode(ProcessResult.FAILED);
-			processResult.setRetMsg("failed");
 			processResult.setErrorCode(ArdError.NAME_REPEAT);
-			ArdLog.error(logger, "registUser error username used", null, null,
-					e);
-			e.printStackTrace();
+			processResult.setErrorDesc("昵称重复");
+			// ArdLog.error(logger, "registUser error username used", null,
+			// null,
+			// e);
+			// e.printStackTrace();
 		} catch (TelNumberRepeatException e1) {
 
-			processResult.setRetCode(ProcessResult.FAILED);
-			processResult.setRetMsg("failed");
 			processResult.setErrorCode(ArdError.TEL_NUM_REGISTED);
-			ArdLog.error(logger, "registUser error telnum used", null, null, e1);
-			e1.printStackTrace();
+			processResult.setErrorDesc("号码已注册");
+			// ArdLog.error(logger, "registUser error telnum used", null, null,
+			// e1);
+			// e1.printStackTrace();
 
 		} catch (Throwable t) {
-			processResult.setRetCode(ProcessResult.FAILED);
 			processResult.setErrorCode(ArdError.EXCEPTION);
 			processResult.setErrorDesc(ArdError.EXCEPTION_MSG);
 			ArdLog.error(logger, "registUser error", null, null, t);
@@ -154,7 +176,7 @@ public class GateController {
 	}
 
 	/**
-	 * 实际的登录代码 如果登录成功，跳转至首页；登录失败，则将失败信息反馈对用户
+	 * 实际的登录代码 如果登录成功，跳转至首页；登录失败，则将失败信息反馈对用户 电话号码_密码 _设备号 加密
 	 * 
 	 * @param request
 	 * @param model
@@ -177,12 +199,13 @@ public class GateController {
 
 			String telnum = userInfo[0];
 			String password = userInfo[1];
+			String deviceInfo = userInfo[2];
 
-			System.out.println(telnum);
-			System.out.println(password);
+			ArdLog.debug(logger, "doLogin", null, " telnum : " + telnum
+					+ " password : " + password + " deviceInfo : " + deviceInfo);
 
 			// 1、用户认证
-			String msg;
+			String msg = null;
 
 			try {
 
@@ -229,9 +252,9 @@ public class GateController {
 			}
 
 		} catch (Throwable t) {
-			result.setRetCode(ProcessResult.FAILED);
 			result.setErrorCode(ArdError.EXCEPTION);
 			result.setErrorDesc(ArdError.EXCEPTION_MSG);
+			ArdLog.error(logger, "login error", null, null, t);
 			t.printStackTrace();
 		}
 
@@ -239,7 +262,7 @@ public class GateController {
 	}
 
 	/**
-	 * 忘记密码
+	 * 忘记密码,申请公钥，将 电话号码_新密码 加密成resetInfo参数
 	 * 
 	 * @param request
 	 * @param response
@@ -247,19 +270,39 @@ public class GateController {
 	 */
 	@RequestMapping(value = "/password_reset", method = RequestMethod.PUT)
 	public ProcessResult resetPassword(HttpServletRequest request,
-			HttpServletResponse response, String telNumber, String smsCode,
-			String newPassword) {
+			HttpServletResponse response, String resetInfo, String smsCode) {
 
 		ProcessResult processResult = new ProcessResult();
 		processResult.setRetCode(ProcessResult.FAILED);
 		processResult.setRetMsg("failed");
-		String code = (String) Redis.redis.get(telNumber);
-		if (code != null && code.equals(smsCode)) {
-			// 更改密码
 
-		} else {
+		try {
+			// 解密参数信息
+			String[] reqInfo = authUserService.decryptReqStr(resetInfo);
 
-			processResult.setErrorCode(ArdError.SMS_CODE_ERROR);
+			String telNumber = reqInfo[0];
+			String newPassowrd = reqInfo[1];
+
+			String code = (String) Redis.redis.get(telNumber + "_auth");
+			if (code != null && code.equals(smsCode)) {
+				// 更改密码
+				ArdUser ardUser = userInfoService
+						.getUserInfoByTelNumber(telNumber);
+				ardUser.setPassword(newPassowrd);
+				userInfoService.updateUserInfo(ardUser);
+				// 删除smscode
+				Redis.redis.remove(telNumber + "_auth");
+				processResult.setRetCode(ProcessResult.SUCCESS);
+				processResult.setRetMsg("ok");
+			} else {
+
+				processResult.setErrorCode(ArdError.SMS_CODE_ERROR);
+			}
+		} catch (Throwable t) {
+			processResult.setErrorCode(ArdError.EXCEPTION);
+			processResult.setErrorDesc(ArdError.EXCEPTION_MSG);
+			ArdLog.error(logger, "login error", null, null, t);
+			t.printStackTrace();
 		}
 
 		return processResult;
@@ -279,8 +322,53 @@ public class GateController {
 		ProcessResult result = (ProcessResult) request
 				.getAttribute("processResult");
 
+		ArdLog.debug(logger, "", "", "debug");
+		ArdLog.info(logger, "", "", "info");
+
 		return result;
 
+	}
+
+	@RequestMapping("/testparam")
+	public ProcessResult testParam(HttpServletRequest request,
+			HttpServletResponse response, String telNumber, String a) {
+
+		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
+
+		Enumeration<String> paramNames = request.getParameterNames();
+
+		while (paramNames.hasMoreElements()) {
+			String paramName = paramNames.nextElement();
+
+			if (paramName.equals("sign")) {
+				continue;
+			}
+
+			System.out.println(paramName);
+
+			String paramValues = (String) request.getParameter(paramName);
+
+			System.out.println(paramValues);
+
+			paramsMap.put(paramName, paramValues);
+
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		Set es = paramsMap.entrySet();
+		Iterator it = es.iterator();
+		while (it.hasNext()) {
+			Map.Entry entry = (Map.Entry) it.next();
+			String k = (String) entry.getKey();
+			String v = (String) entry.getValue();
+			if (null != v && !"".equals(v)) {
+				sb.append(k + "=" + v + "&");
+			}
+		}
+		sb.append("token=" + "token");
+		System.out.println("服务端签名" + sb.toString());
+		return null;
 	}
 
 }

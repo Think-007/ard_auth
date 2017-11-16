@@ -22,7 +22,7 @@
 		<property name="serviceInterface"
 				  value="com.think.creator.facade.IdCreatorFacade" />
 		<property name="serviceUrl" value="${id.url}IdCreatorFacade" />
-		<property name="readTimeout" value="1000" />
+		<property name="readTimeout" value="5000" />
 	</bean>
 	
 </beans>

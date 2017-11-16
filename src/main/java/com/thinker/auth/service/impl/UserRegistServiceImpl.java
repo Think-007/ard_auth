@@ -42,7 +42,8 @@ public class UserRegistServiceImpl implements UserRegistService {
 			ArdUserRole ardUserRole) throws Exception {
 
 		// 分配用户uid
-		String userId = Math.random() * 1000000 + "";
+		String userId = (new Double(Math.random() * 1000000000)).longValue()
+				+ "";
 		Date createTime = Calendar.getInstance().getTime();
 		// 创建用户别名
 		ArdUserBm ardUserBm = new ArdUserBm();

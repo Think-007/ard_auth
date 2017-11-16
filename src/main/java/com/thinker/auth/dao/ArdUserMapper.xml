@@ -37,6 +37,17 @@
 		where t2.tel_num=#{telNumber}
 
 	</select>
+	
+		<select id="queryArdUserByuserId" resultType="ArdUser">
+		select
+		user_id as userId,password as password,salt as salt,status
+		as status
+		
+		from ard_user
+		
+		where user_id=#{userId}
+
+	</select>
 
 	<select id="queryArdUserDetailByTelNumber" resultType="UserInfoDetail">
 

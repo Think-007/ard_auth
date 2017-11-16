@@ -16,6 +16,15 @@
 		)
 
 	</insert>
+	<update id="updateUseBm">
+	
+		update ard_user_bm
+		set 
+		username = #{userName}
+		
+		where userId = #{userId}
+	
+	</update>
 
 
 

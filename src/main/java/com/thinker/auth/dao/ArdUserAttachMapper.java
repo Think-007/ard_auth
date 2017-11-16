@@ -13,11 +13,19 @@ public interface ArdUserAttachMapper {
 	public int insertUserAttach(ArdUserAttach ardUserAttach);
 
 	/**
-	 * 更具uid更新用户信息
+	 * 根据uid更新用户信息
 	 * 
 	 * @param ardUserAttach
 	 * @return
 	 */
 	public int updateUserAttach(ArdUserAttach ardUserAttach);
+
+	/**
+	 * 根据电话号差查询用户附加信息
+	 * 
+	 * @param telNumber
+	 * @return
+	 */
+	public ArdUserAttach queryUserAttachByTelNum(String telNumber);
 
 }
