@@ -1,13 +1,22 @@
 package com.thinker.test;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.annotation.Resource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import redis.clients.jedis.JedisCluster;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.thinker.auth.dao.ArdUserMapper;
 import com.thinker.auth.domain.ArdUser;
@@ -19,7 +28,7 @@ public class ArdAuthApplicationTests {
 
 	@Resource
 	private ArdUserMapper ardUserMapper;
-	
+
 	@Resource
 	private UserRegistService userRegistService;
 
@@ -34,14 +43,51 @@ public class ArdAuthApplicationTests {
 			e.printStackTrace();
 		}
 	}
-	
-	@Resource
-	private JedisCluster jedisCluster;
+
+	// @Resource
+	// private JedisCluster jedisCluster;
+	//
+	// @Test
+	// public void testJedis() {
+	//
+	// jedisCluster.set("afsda", "4354");
+	// }
+
+	private MockMvc mvc;
+	@Autowired
+	private WebApplicationContext context;
+
+	@Before
+	public void setUp() throws Exception {
+		mvc = MockMvcBuilders.webAppContextSetup(context).build();// 建议使用这种
+	}
+
 	@Test
-	public void testJedis(){
-		
-		
-		jedisCluster.set("afsda", "4354");
+	public void testmvc() {
+
+		try {
+			String expectedResult = "hello world!";
+			String uri = "/auth/code/publickey";
+			MockHttpServletRequestBuilder mockRequestBuilder = MockMvcRequestBuilders.get(uri).header("uid", "ss")
+					.header("timestamp", System.currentTimeMillis()).accept(MediaType.APPLICATION_JSON);
+			MvcResult mvcResult = mvc.perform(mockRequestBuilder).andReturn();
+			
+			
+			int status = mvcResult.getResponse().getStatus();
+			
+			
+			String content = mvcResult.getResponse().getContentAsString();
+
+			System.out.println(content);
+
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }

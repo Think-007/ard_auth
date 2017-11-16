@@ -31,11 +31,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.think.creator.domain.ProcessResult;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserRole;
 import com.thinker.auth.domain.UserInfoDetail;
 import com.thinker.auth.domain.UserRegistParam;
+import com.thinker.auth.domain.result.LoginResult;
 import com.thinker.auth.exception.PassWordErrorException;
 import com.thinker.auth.exception.TelNumberRepeatException;
 import com.thinker.auth.exception.UserLockException;
@@ -46,10 +46,10 @@ import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.service.UserRegistService;
 import com.thinker.auth.util.Redis;
 import com.thinker.auth.util.TokenUtil;
+import com.thinker.creator.domain.ProcessResult;
 import com.thinker.security.RSAEncrypt;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
-import com.thinker.util.CacheUtil;
 
 /**
  * 
@@ -66,8 +66,7 @@ import com.thinker.util.CacheUtil;
 @RequestMapping("/auth/gate")
 public class GateController {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(GateController.class);
+	private static final Logger logger = LoggerFactory.getLogger(GateController.class);
 
 	// 随机盐值
 	@Value("${shiro.salt}")
@@ -97,11 +96,8 @@ public class GateController {
 	 */
 	@RequestMapping(value = "/registration", method = RequestMethod.POST)
 	public ProcessResult registUser(String registInfo, String smsCode) {
-		ArdLog.info(logger, "enter registUser ", null, "userRegistParam: "
-				+ registInfo + "smsCode: " + smsCode);
+		ArdLog.info(logger, "enter registUser ", null, "userRegistParam: " + registInfo + "smsCode: " + smsCode);
 		ProcessResult processResult = new ProcessResult();
-		processResult.setRetCode(ProcessResult.FAILED);
-		processResult.setRetMsg("failed");
 
 		try {
 
@@ -122,19 +118,17 @@ public class GateController {
 
 			if (smsCode == null || !smsCode.equals(redisSmsCode)) {
 
-				processResult.setErrorCode(ArdError.SMS_CODE_ERROR);
+				processResult.setRetCode(ArdError.SMS_CODE_ERROR);
 				return processResult;
 			}
 
 			// 2.密码加盐
 
-			ArdLog.debug(logger, "registUser", null, "salt: " + saltStr
-					+ "hashIterations: " + hashIterations);
+			ArdLog.debug(logger, "registUser", null, "salt: " + saltStr + "hashIterations: " + hashIterations);
 			System.out.println(saltStr);
 			System.out.println(hashIterations);
 
-			Md5Hash mh = new Md5Hash(userRegistParam.getPassword(), saltStr,
-					hashIterations);
+			Md5Hash mh = new Md5Hash(userRegistParam.getPassword(), saltStr, hashIterations);
 			System.out.println(mh.toString());
 			userRegistParam.setPassword(mh.toString());
 
@@ -149,28 +143,27 @@ public class GateController {
 			processResult.setRetMsg("ok");
 		} catch (UserNameRepeatException e) {
 
-			processResult.setErrorCode(ArdError.NAME_REPEAT);
-			processResult.setErrorDesc("昵称重复");
+			processResult.setRetCode(ArdError.NAME_REPEAT);
+			processResult.setRetMsg("昵称重复");
 			// ArdLog.error(logger, "registUser error username used", null,
 			// null,
 			// e);
 			// e.printStackTrace();
 		} catch (TelNumberRepeatException e1) {
 
-			processResult.setErrorCode(ArdError.TEL_NUM_REGISTED);
-			processResult.setErrorDesc("号码已注册");
+			processResult.setRetCode(ArdError.TEL_NUM_REGISTED);
+			processResult.setRetMsg("号码已注册");
 			// ArdLog.error(logger, "registUser error telnum used", null, null,
 			// e1);
 			// e1.printStackTrace();
 
 		} catch (Throwable t) {
-			processResult.setErrorCode(ArdError.EXCEPTION);
-			processResult.setErrorDesc(ArdError.EXCEPTION_MSG);
+			processResult.setRetCode(ArdError.EXCEPTION);
+			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
 			ArdLog.error(logger, "registUser error", null, null, t);
 			t.printStackTrace();
 		}
-		ArdLog.info(logger, "finish registUser ", null, "processresult: "
-				+ processResult);
+		ArdLog.info(logger, "finish registUser ", null, "processresult: " + processResult);
 
 		return processResult;
 	}
@@ -187,9 +180,7 @@ public class GateController {
 	@RequestMapping(value = "/app_authentication", method = RequestMethod.POST)
 	public ProcessResult doLogin(String loginInfo, String key) {
 
-		ProcessResult result = new ProcessResult();
-		result.setRetCode(ProcessResult.FAILED);
-		result.setRetMsg("failed");
+		ProcessResult processResult = new ProcessResult();
 
 		try {
 			// 解析用户登录信息密文
@@ -201,8 +192,8 @@ public class GateController {
 			String password = userInfo[1];
 			String deviceInfo = userInfo[2];
 
-			ArdLog.debug(logger, "doLogin", null, " telnum : " + telnum
-					+ " password : " + password + " deviceInfo : " + deviceInfo);
+			ArdLog.debug(logger, "doLogin", null,
+					" telnum : " + telnum + " password : " + password + " deviceInfo : " + deviceInfo);
 
 			// 1、用户认证
 			String msg = null;
@@ -211,20 +202,20 @@ public class GateController {
 
 				if (authUserService.authUser(telnum, password)) {
 
-					result.setRetCode(ProcessResult.SUCCESS);
-					result.setRetMsg("ok");
+					processResult.setRetCode(ProcessResult.SUCCESS);
+					processResult.setRetMsg("ok");
 					String loginToken = TokenUtil.generateToken(telnum);
 					// 将token用客户端给公钥加密返回给客户端
-					String encryptToken = new String(RSAEncrypt.encrypt(
-							RSAEncrypt.loadPublicKeyByStr(publicKey),
-							loginToken.getBytes()));
+					String encryptToken = new String(
+							RSAEncrypt.encrypt(RSAEncrypt.loadPublicKeyByStr(publicKey), loginToken.getBytes()));
 					// 2、返回用户信息
-					UserInfoDetail userInfoDetail = userInfoService
-							.getUserInfoDetailByTelNumber(telnum);
-					Map<Object, Object> map = new HashMap<Object, Object>();
-					map.put("userInof", userInfoDetail);
-					map.put("tokenInfo", encryptToken);
-					result.setRetObj(map);
+					UserInfoDetail userInfoDetail = userInfoService.getUserInfoDetailByTelNumber(telnum);
+
+					LoginResult loginResult = new LoginResult();
+					loginResult.setUserInfoDetail(userInfoDetail);
+					loginResult.setToken(loginToken);
+
+					processResult.setRetObj(loginResult);
 
 					// 3、存储token和用户信息
 
@@ -233,32 +224,30 @@ public class GateController {
 				}
 
 			} catch (PassWordErrorException e) {
-				msg = "登录密码错误. Password for account " + telnum
-						+ " was incorrect.";
-				result.setErrorCode(ArdError.PASSWORD_ERROR);
-				result.setErrorDesc(msg);
+				msg = "登录密码错误. Password for account " + telnum + " was incorrect.";
+				processResult.setRetCode(ArdError.PASSWORD_ERROR);
+				processResult.setRetMsg(msg);
 				System.out.println(msg);
 			} catch (UserLockException e) {
-				msg = "帐号已被锁定. The account for username " + telnum
-						+ " was disabled.";
-				result.setErrorCode(ArdError.USER_LOCKED);
-				result.setErrorDesc(msg);
+				msg = "帐号已被锁定. The account for username " + telnum + " was disabled.";
+				processResult.setRetCode(ArdError.USER_LOCKED);
+				processResult.setRetMsg(msg);
 				System.out.println(msg);
 			} catch (UserNotExistException e) {
 				msg = "帐号不存在. There is no user with username of " + telnum;
-				result.setErrorCode(ArdError.USER_NOT_EXIST);
-				result.setErrorDesc(msg);
+				processResult.setRetCode(ArdError.USER_NOT_EXIST);
+				processResult.setRetMsg(msg);
 				System.out.println(msg);
 			}
 
 		} catch (Throwable t) {
-			result.setErrorCode(ArdError.EXCEPTION);
-			result.setErrorDesc(ArdError.EXCEPTION_MSG);
+			processResult.setRetCode(ArdError.EXCEPTION);
+			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
 			ArdLog.error(logger, "login error", null, null, t);
 			t.printStackTrace();
 		}
 
-		return result;
+		return processResult;
 	}
 
 	/**
@@ -269,12 +258,10 @@ public class GateController {
 	 * @return
 	 */
 	@RequestMapping(value = "/password_reset", method = RequestMethod.PUT)
-	public ProcessResult resetPassword(HttpServletRequest request,
-			HttpServletResponse response, String resetInfo, String smsCode) {
+	public ProcessResult resetPassword(HttpServletRequest request, HttpServletResponse response, String resetInfo,
+			String smsCode) {
 
 		ProcessResult processResult = new ProcessResult();
-		processResult.setRetCode(ProcessResult.FAILED);
-		processResult.setRetMsg("failed");
 
 		try {
 			// 解密参数信息
@@ -286,21 +273,19 @@ public class GateController {
 			String code = (String) Redis.redis.get(telNumber + "_auth");
 			if (code != null && code.equals(smsCode)) {
 				// 更改密码
-				ArdUser ardUser = userInfoService
-						.getUserInfoByTelNumber(telNumber);
-				ardUser.setPassword(newPassowrd);
-				userInfoService.updateUserInfo(ardUser);
+				ArdUser ardUser = userInfoService.getUserInfoByTelNumber(telNumber);
+				userInfoService.updateUserPassword(ardUser.getUserId(), newPassowrd);
 				// 删除smscode
 				Redis.redis.remove(telNumber + "_auth");
 				processResult.setRetCode(ProcessResult.SUCCESS);
 				processResult.setRetMsg("ok");
 			} else {
 
-				processResult.setErrorCode(ArdError.SMS_CODE_ERROR);
+				processResult.setRetCode(ArdError.SMS_CODE_ERROR);
 			}
 		} catch (Throwable t) {
-			processResult.setErrorCode(ArdError.EXCEPTION);
-			processResult.setErrorDesc(ArdError.EXCEPTION_MSG);
+			processResult.setRetCode(ArdError.EXCEPTION);
+			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
 			ArdLog.error(logger, "login error", null, null, t);
 			t.printStackTrace();
 		}
@@ -317,10 +302,8 @@ public class GateController {
 	 * @return
 	 */
 	@RequestMapping("/tokenstatus")
-	public ProcessResult retTokenStatus(HttpServletRequest request,
-			HttpServletResponse response) {
-		ProcessResult result = (ProcessResult) request
-				.getAttribute("processResult");
+	public ProcessResult retTokenStatus(HttpServletRequest request, HttpServletResponse response) {
+		ProcessResult result = (ProcessResult) request.getAttribute("processResult");
 
 		ArdLog.debug(logger, "", "", "debug");
 		ArdLog.info(logger, "", "", "info");
@@ -330,8 +313,8 @@ public class GateController {
 	}
 
 	@RequestMapping("/testparam")
-	public ProcessResult testParam(HttpServletRequest request,
-			HttpServletResponse response, String telNumber, String a) {
+	public ProcessResult testParam(HttpServletRequest request, HttpServletResponse response, String telNumber,
+			String a) {
 
 		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
 

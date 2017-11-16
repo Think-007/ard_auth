@@ -11,6 +11,7 @@ import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserAttach;
 import com.thinker.auth.domain.ArdUserBm;
 import com.thinker.auth.domain.UserInfoDetail;
+import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.service.UserInfoService;
 
 @Service
@@ -47,8 +48,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Override
 	public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber) {
 
-		UserInfoDetail userInfoDetail = ardUserMapper
-				.queryArdUserDetailByTelNumber(telNumber);
+		UserInfoDetail userInfoDetail = ardUserMapper.queryArdUserDetailByTelNumber(telNumber);
 
 		return userInfoDetail;
 	}
@@ -62,9 +62,11 @@ public class UserInfoServiceImpl implements UserInfoService {
 	}
 
 	@Override
-	public int updateUserInfo(ArdUser ardUser) {
+	public int updateUserPassword(String userId, String password) {
 		// TODO Auto-generated method stub
-
+		ArdUser ardUser = new ArdUser();
+		ardUser.setUserId(userId);
+		ardUser.setPassword(password);
 		int result = ardUserMapper.updateArdUser(ardUser);
 
 		return result;
@@ -83,7 +85,13 @@ public class UserInfoServiceImpl implements UserInfoService {
 		ArdUserBm bm = new ArdUserBm();
 		bm.setUserId(userId);
 		bm.setUserName(userName);
-		int result = ardUserBmMapper.updateUseBm(bm);
+		int result;
+		try {
+			result = ardUserBmMapper.updateUseBm(bm);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new UserNameRepeatException("昵称重复");
+		}
 		return result;
 	}
 }

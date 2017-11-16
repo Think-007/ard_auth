@@ -37,7 +37,7 @@ public interface UserInfoService {
 	 * @param ardUser
 	 * @return
 	 */
-	public int updateUserInfo(ArdUser ardUser);
+	public int updateUserPassword(String userId, String password);
 
 	/**
 	 * 根据uid查询用户信息

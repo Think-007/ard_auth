@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 /**
  * 
- * 类简要描述
+ * 用户详细信息
  * 
  * <p>
  * 类详细描述
@@ -133,10 +133,9 @@ public class UserInfoDetail implements Serializable {
 
 	@Override
 	public String toString() {
-		return "UserInfoDetail [userId=" + userId + ", userName=" + userName
-				+ ", telNumber=" + telNumber + ", sex=" + sex + ", status="
-				+ status + ", level=" + level + ", thumbURL=" + thumbURL
-				+ ", headpicURL=" + headpicURL + ", roleId=" + roleId + "]";
+		return "UserInfoDetail [userId=" + userId + ", userName=" + userName + ", telNumber=" + telNumber + ", sex="
+				+ sex + ", status=" + status + ", level=" + level + ", thumbURL=" + thumbURL + ", headpicURL="
+				+ headpicURL + ", roleId=" + roleId + "]";
 	}
 
 }
