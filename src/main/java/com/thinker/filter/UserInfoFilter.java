@@ -54,10 +54,10 @@ public class UserInfoFilter implements Filter {
 		System.out.println("进入token拦截器");
 		ProcessResult processResult = new ProcessResult();
 		String uid = request.getHeader("uid");
-
+		String reqToken = request.getHeader("token");
 		String token = (String) Redis.redis.get(uid);
 
-		if (token == null) {
+		if (token == null || reqToken == null || !reqToken.equals(token)) {
 
 			System.out.println("token 不存在");
 

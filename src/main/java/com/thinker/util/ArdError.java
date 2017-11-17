@@ -31,5 +31,7 @@ public interface ArdError {
 	public static final int TOKEN_TIME_OUT = 20002;
 	// 签名不对，参数不合法。
 	public static final int PARAM_ILLEGAL = 20003;
+	// 自动登录令牌过期
+	public static final int AUTO_LOGIN_TOKEN_TIME_OUT = 20004;
 
 }

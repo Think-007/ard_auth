@@ -292,16 +292,18 @@ public class GateController {
 			String encryptToken = new String(RSAEncrypt.encrypt(
 					RSAEncrypt.loadPublicKeyByStr(key), retInfo.getBytes()));
 
-			if (userInfoDetail != null) {
+			if (userInfoDetail == null) {
+				processResult.setRetCode(ArdError.AUTO_LOGIN_TOKEN_TIME_OUT);
+				processResult.setRetMsg("令牌过期");
 
-				LoginResult loginResult = new LoginResult();
-				loginResult.setUserInfoDetail(userInfoDetail);
-				loginResult.setToken(encryptToken);
-				processResult.setRetCode(ProcessResult.SUCCESS);
-				processResult.setRetMsg("ok");
-				processResult.setRetObj(loginResult);
+				return processResult;
 			}
-
+			LoginResult loginResult = new LoginResult();
+			loginResult.setUserInfoDetail(userInfoDetail);
+			loginResult.setToken(encryptToken);
+			processResult.setRetCode(ProcessResult.SUCCESS);
+			processResult.setRetMsg("ok");
+			processResult.setRetObj(loginResult);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 
