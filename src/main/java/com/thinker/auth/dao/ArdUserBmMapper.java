@@ -34,6 +34,6 @@ public interface ArdUserBmMapper {
 	 * @param ardUserBm
 	 * @return
 	 */
-	public int updateUseBm(ArdUserBm ardUserBm);
+	public int updateUserBm(ArdUserBm ardUserBm);
 
 }

@@ -8,11 +8,13 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.thinker.auth.dao.ArdUserAccountMapper;
 import com.thinker.auth.dao.ArdUserAttachMapper;
 import com.thinker.auth.dao.ArdUserBmMapper;
 import com.thinker.auth.dao.ArdUserMapper;
 import com.thinker.auth.dao.ArdUserRoleMapper;
 import com.thinker.auth.domain.ArdUser;
+import com.thinker.auth.domain.ArdUserAccount;
 import com.thinker.auth.domain.ArdUserAttach;
 import com.thinker.auth.domain.ArdUserBm;
 import com.thinker.auth.domain.ArdUserRole;
@@ -20,6 +22,7 @@ import com.thinker.auth.domain.UserRegistParam;
 import com.thinker.auth.exception.TelNumberRepeatException;
 import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.service.UserRegistService;
+import com.thinker.util.ArdConst;
 
 @Service
 public class UserRegistServiceImpl implements UserRegistService {
@@ -36,16 +39,19 @@ public class UserRegistServiceImpl implements UserRegistService {
 	@Resource
 	private ArdUserBmMapper ardUserBmMapper;
 
+	@Resource
+	private ArdUserAccountMapper ardUserAccountMapper;
+
 	@Override
 	@Transactional
 	public void regitsUser(UserRegistParam userRegistParam, String salt,
 			ArdUserRole ardUserRole) throws Exception {
 
-		// 分配用户uid
+		// 1.分配用户uid
 		String userId = (new Double(Math.random() * 1000000000)).longValue()
 				+ "";
 		Date createTime = Calendar.getInstance().getTime();
-		// 创建用户别名
+		// 2 .创建用户别名
 		ArdUserBm ardUserBm = new ArdUserBm();
 		ardUserBm.setUserId(userId);
 		ardUserBm.setUserName(userRegistParam.getUserName());
@@ -56,7 +62,7 @@ public class UserRegistServiceImpl implements UserRegistService {
 			e.printStackTrace();
 			throw new UserNameRepeatException("用户名重复");
 		}
-		// 绑定用户电话信息
+		// 3.绑定用户电话信息
 		ArdUserAttach ardUserAttach = new ArdUserAttach();
 		ardUserAttach.setUserId(userId);
 		ardUserAttach.setTelNum(userRegistParam.getTelNumber());
@@ -70,12 +76,19 @@ public class UserRegistServiceImpl implements UserRegistService {
 			throw new TelNumberRepeatException("手机号重复");
 		}
 
-		// 定位用户角色为普通用户
+		// 4.定位用户角色为普通用户
 		ardUserRole.setUserId(userId);
 		ardUserRole.setCreateTime(createTime);
 		ardUserRoleMapper.insertAruUserRole(ardUserRole);
 
-		// 注册用户
+		// 5.开通用户的积分账户
+		ArdUserAccount ardUserAccount = new ArdUserAccount();
+		ardUserAccount.setUserId(userId);
+		ardUserAccount.setBalance(0);
+		ardUserAccount.setAccountType(ArdConst.BONUS);
+		ardUserAccountMapper.insertArdUserAccount(ardUserAccount);
+
+		// 6.注册用户
 		ArdUser ardUser = new ArdUser();
 		ardUser.setUserId(userId);
 		ardUser.setPassword(userRegistParam.getPassword());

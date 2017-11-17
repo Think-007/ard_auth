@@ -25,9 +25,21 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 
 public class TokenUtil {
 
-	public static String generateToken(String userName) {
+	// 登录令牌
+	public static String generateLoginToken(String randInfo) {
 
-		String str = System.currentTimeMillis() + userName;
+		String str = System.currentTimeMillis() + randInfo;
+
+		Md5Hash token = new Md5Hash(str, "ard", 3);
+
+		return token.toString();
+
+	}
+
+	// 长连接token
+	public static String generateToken() {
+
+		String str = System.currentTimeMillis() + Math.random() * 10000 + "";
 
 		Md5Hash token = new Md5Hash(str, "ard", 3);
 

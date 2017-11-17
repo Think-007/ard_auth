@@ -29,7 +29,8 @@ public interface UserInfoService {
 	 * @param userId
 	 * @return
 	 */
-	public int updateUserHeadPic(ArdUserAttach ardUserAttach);
+	public ArdUserAttach updateUserHeadPic(String userId, String thumbURL,
+			String headPicURL);
 
 	/**
 	 * 更新用户信息
@@ -55,6 +56,15 @@ public interface UserInfoService {
 	 * @return
 	 * @throws Exception
 	 */
-	public int updateUserBm(String userId, String userName) throws Exception;
+	public ArdUserBm updateUserBm(String userId, String userName) throws Exception;
+
+	/**
+	 * 根据uid更新电话号码
+	 * 
+	 * @param userId
+	 * @param telNumber
+	 * @return
+	 */
+	public ArdUserAttach updaetTemNumberByUserId(String userId, String telNumber);
 
 }

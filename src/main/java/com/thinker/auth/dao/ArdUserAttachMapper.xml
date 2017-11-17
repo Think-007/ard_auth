@@ -51,6 +51,8 @@
 		where tel_num = #{telNumber};
 
 	</select>
+	
+
 
 
 	<!-- <select id="queryComissionCountAndSum" resultType="java.util.Map"> 

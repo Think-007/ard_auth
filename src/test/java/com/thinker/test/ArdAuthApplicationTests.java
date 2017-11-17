@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import javax.annotation.Resource;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,15 +67,17 @@ public class ArdAuthApplicationTests {
 	public void testmvc() {
 
 		try {
-			String expectedResult = "hello world!";
 			String uri = "/auth/code/publickey";
-			MockHttpServletRequestBuilder mockRequestBuilder = MockMvcRequestBuilders.get(uri).header("uid", "ss")
-					.header("timestamp", System.currentTimeMillis()).accept(MediaType.APPLICATION_JSON);
+			MockHttpServletRequestBuilder mockRequestBuilder = MockMvcRequestBuilders
+					.get(uri).header("uid", "ss")
+					.header("timestamp", System.currentTimeMillis())
+					.accept(MediaType.APPLICATION_JSON);
+
 			MvcResult mvcResult = mvc.perform(mockRequestBuilder).andReturn();
-			
-			
+
 			int status = mvcResult.getResponse().getStatus();
-			
+
+			Assert.assertTrue(200 == status);
 			
 			String content = mvcResult.getResponse().getContentAsString();
 

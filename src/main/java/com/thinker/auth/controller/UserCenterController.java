@@ -9,6 +9,8 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.coobird.thumbnailator.Thumbnails;
+
 import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,21 +23,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserAttach;
+import com.thinker.auth.domain.ArdUserBm;
 import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.service.AuthUserService;
+import com.thinker.auth.service.UserAccountService;
 import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.util.Redis;
 import com.thinker.creator.domain.ProcessResult;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
 
-import net.coobird.thumbnailator.Thumbnails;
-
 @RestController
 @RequestMapping("/filter/auth")
 public class UserCenterController {
 
-	private static final Logger logger = LoggerFactory.getLogger(UserCenterController.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(UserCenterController.class);
 
 	// 随机盐值
 	@Value("${shiro.salt}")
@@ -50,12 +53,38 @@ public class UserCenterController {
 	@Resource
 	private AuthUserService authUserService;
 
-	// @RequestMapping("/signin/{uid}/{timestamp}")
-	// public ProcessResult singnIn() {
-	//
-	// return null;
-	//
-	// }
+	// 用户账户业务
+	@Resource
+	private UserAccountService userAccountService;
+
+	// 签到积分
+	@Value("${ard.bonus}")
+	private double bonus;
+
+	/**
+	 * 签到
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/signin", method = RequestMethod.GET)
+	public ProcessResult singnIn(HttpServletRequest request,
+			HttpServletResponse response) {
+		ArdLog.debug(logger, "enter singnIn", null, null);
+		;
+
+		ProcessResult processResult = new ProcessResult();
+
+		String userId = request.getHeader("uid");
+
+		userAccountService.updateUseAccountInfoByUseId(userId, bonus);
+
+		processResult.setRetCode(ProcessResult.SUCCESS);
+
+		ArdLog.debug(logger, "finish singnIn", null, processResult);
+		return processResult;
+
+	}
+
 	/**
 	 * 上传头像
 	 * 
@@ -64,8 +93,8 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping(value = "/headpic", method = RequestMethod.POST)
-	public ProcessResult uploadPic(@RequestParam("file") MultipartFile file, HttpServletRequest request,
-			HttpServletResponse response) {
+	public ProcessResult uploadPic(@RequestParam("file") MultipartFile file,
+			HttpServletRequest request, HttpServletResponse response) {
 
 		ProcessResult processResult = new ProcessResult();
 
@@ -74,7 +103,8 @@ public class UserCenterController {
 		// 获取图片原始名称
 		String originalFilename = file.getOriginalFilename();
 		// 图片扩展名
-		String types = originalFilename.substring(originalFilename.lastIndexOf(".") + 1).toLowerCase();
+		String types = originalFilename.substring(
+				originalFilename.lastIndexOf(".") + 1).toLowerCase();
 		String newFileName = uid + "." + types;
 		String filePath = "D:/upload/users/imgs/" + uid + "/";
 
@@ -106,17 +136,19 @@ public class UserCenterController {
 			out.write(file.getBytes());
 			out.flush();
 			out.close();
-			Thumbnails.of(originfile).scale(1f).outputQuality(0.25f).toFile(picfile);
-			Thumbnails.of(originfile).size(80, 80).keepAspectRatio(false).toFile(micPicFile);
+			Thumbnails.of(originfile).scale(1f).outputQuality(0.25f)
+					.toFile(picfile);
+			Thumbnails.of(originfile).size(80, 80).keepAspectRatio(false)
+					.toFile(micPicFile);
 
 			String[] picArr = new String[3];
-			picArr[0]= originalFilename.toString();
+			picArr[0] = originalFilename.toString();
 			picArr[1] = picfile.toString();
 			picArr[2] = micPicFile.toString();
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
 			processResult.setRetObj(picArr);
-			
+
 		} catch (Exception e) {
 			processResult.setRetCode(ArdError.EXCEPTION);
 			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
@@ -141,19 +173,20 @@ public class UserCenterController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping("/user_head")
-	public ProcessResult setHeadPic(HttpServletRequest request, HttpServletResponse response, String picPath,
-			String micPicPath) {
+	@RequestMapping(value = "/user_head", method = RequestMethod.POST)
+	public ProcessResult setHeadPic(HttpServletRequest request,
+			HttpServletResponse response, String picPath, String micPicPath) {
 		ProcessResult processResult = new ProcessResult();
 
 		try {
 			String userId = (String) request.getAttribute("uid");
-			ArdUserAttach ardUserAttach = new ArdUserAttach();
-			ardUserAttach.setUserId(userId);
-			ardUserAttach.setThumbURL(micPicPath);
-			ardUserAttach.setHeadpicURL(picPath);
-			ArdLog.info(logger, "setHeadPic", null, ardUserAttach);
-			userInfoService.updateUserHeadPic(ardUserAttach);
+
+			ArdLog.info(logger, "setHeadPic", null, " userid: " + userId
+					+ " picPaht : " + picPath + " micPicPaht : " + micPicPath);
+
+			ArdUserAttach ardUserAttach = userInfoService.updateUserHeadPic(
+					userId, picPath, micPicPath);
+
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
 			processResult.setRetObj(ardUserAttach);
@@ -178,11 +211,12 @@ public class UserCenterController {
 	 * @return
 	 */
 
-	@RequestMapping(value = "/password/old", method = RequestMethod.GET)
-	public ProcessResult checkOldPassword(HttpServletRequest request, HttpServletResponse response,
-			String oldPassword) {
+	@RequestMapping(value = "/password/old", method = RequestMethod.POST)
+	public ProcessResult checkOldPassword(HttpServletRequest request,
+			HttpServletResponse response, String oldPassword) {
 
-		ArdLog.info(logger, "checkOldPassword", null, "oldPassword : " + oldPassword);
+		ArdLog.info(logger, "checkOldPassword", null, "oldPassword : "
+				+ oldPassword);
 		ProcessResult processResult = new ProcessResult();
 		try {
 			// 解析用户 旧密码
@@ -194,7 +228,8 @@ public class UserCenterController {
 			ArdUser ardUser = userInfoService.getUserInfoByuserId(userId);
 			if (ardUser != null) {
 
-				Md5Hash mh = new Md5Hash(reqInfo[0], ardUser.getSalt(), hashIterations);
+				Md5Hash mh = new Md5Hash(reqInfo[0], ardUser.getSalt(),
+						hashIterations);
 				// 2.判断就密码是否正确
 				if (mh.toString().equals(ardUser.getPassword())) {
 					processResult.setRetCode(ProcessResult.SUCCESS);
@@ -224,7 +259,8 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping(value = "/password/new", method = RequestMethod.PUT)
-	public ProcessResult changePassword(HttpServletRequest request, HttpServletResponse response, String newPassword) {
+	public ProcessResult changePassword(HttpServletRequest request,
+			HttpServletResponse response, String newPassword) {
 
 		ArdLog.info(logger, "enter changePassword", null, newPassword);
 		ProcessResult processResult = new ProcessResult();
@@ -265,24 +301,57 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping(value = "/telnumber", method = RequestMethod.PUT)
-	public ProcessResult resetTelnumber(HttpServletRequest request, HttpServletResponse response, String telNumber,
-			String smsCode) {
+	public ProcessResult resetTelnumber(HttpServletRequest request,
+			HttpServletResponse response, String telNumber, String smsCode) {
 
-		ProcessResult result = new ProcessResult();
+		ProcessResult processResult = new ProcessResult();
 
-		return result;
+		String userId = request.getHeader("uid");
+
+		// 判断短信码是否正确啊
+		if (smsCode == null
+				|| smsCode.equals(Redis.redis.get(telNumber + "_auth"))) {
+
+			processResult.setRetCode(ArdError.PARAM_ILLEGAL);
+
+			return processResult;
+
+		}
+
+		// 更新电话
+		ArdUserAttach ardUserAttach = userInfoService.updaetTemNumberByUserId(
+				userId, telNumber);
+
+		processResult.setRetObj(ardUserAttach);
+
+		return processResult;
 
 	}
 
-	@RequestMapping(value = "/username", method = RequestMethod.POST)
-	public ProcessResult modifyUserName(HttpServletRequest request, HttpServletResponse response, String userName) {
+	/**
+	 * 更改昵称
+	 * 
+	 * @param request
+	 * @param response
+	 * @param userName
+	 * @return
+	 */
+	@RequestMapping(value = "/username", method = RequestMethod.PUT)
+	public ProcessResult modifyUserName(HttpServletRequest request,
+			HttpServletResponse response, String userName) {
 
-		ArdLog.debug(logger, "enter modifyUserName", null, " userName : " + userName);
+		ArdLog.debug(logger, "enter modifyUserName", null, " userName : "
+				+ userName);
 		ProcessResult processResult = new ProcessResult();
 		String userId = request.getHeader("uid");
 
 		try {
-			userInfoService.updateUserBm(userId, userName);
+			ArdUserBm ardUserBm = userInfoService
+					.updateUserBm(userId, userName);
+			processResult.setRetCode(ProcessResult.SUCCESS);
+			processResult.setRetMsg("ok");
+			processResult.setRetObj(ardUserBm);
+
 		} catch (UserNameRepeatException e) {
 
 			processResult.setRetCode(ArdError.NAME_REPEAT);
@@ -305,8 +374,9 @@ public class UserCenterController {
 	 * @param response
 	 * @param uid
 	 */
-	@RequestMapping(value = "/out", method = RequestMethod.POST)
-	public void checkOut(HttpServletRequest request, HttpServletResponse response) {
+	@RequestMapping(value = "/out", method = RequestMethod.GET)
+	public void checkOut(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		String uid = request.getHeader("uid");
 		// app还要删除token
@@ -322,7 +392,8 @@ public class UserCenterController {
 	 * @return
 	 */
 	@RequestMapping("/unbind")
-	public ProcessResult unbindTelNumber(HttpServletRequest request, HttpServletResponse response, String telNumber) {
+	public ProcessResult unbindTelNumber(HttpServletRequest request,
+			HttpServletResponse response, String telNumber) {
 
 		ProcessResult result = new ProcessResult();
 

@@ -3,11 +3,48 @@
 <mapper namespace="com.thinker.auth.dao.ArdUserAccountMapper">
 
 
-<!-- 	<select id="test" resultType="int">
+	<insert id="insertArdUserAccount" parameterType="ArdUserAccount">
 
-		select 1 from dual;
+		insert into
+		ard_user_account(
+		user_id,
+		account_type,
+		balance
 
-	</select> -->
+		)
+		values(
+		#{userId},
+		#{accountType},
+		#{balance}
+
+		)
+
+	</insert>
+
+	<select id="queryArdUserAccountByUserId" resultType="ArdUserAccount">
+
+		select
+		user_id as userId,
+		account_type as accountType,
+		balance as balance,
+		updatetime as updateTime
+		from ard_user_account
+		where user_id = #{userId}
+
+
+	</select>
+	
+		<update id="updateArdUserAccount" parameterType="ArdUserAccount">
+		update ard_user_account
+		
+		set 
+		balance = #{balance}
+		
+		where user_id = #{userId}
+	
+	</update>
+
+	<!-- <select id="test" resultType="int"> select 1 from dual; </select> -->
 
 
 	<!-- <select id="queryComissionCountAndSum" resultType="java.util.Map"> 

@@ -1,9 +1,5 @@
 package com.thinker.auth.controller;
 
-import java.awt.image.BufferedImage;
-import java.io.OutputStream;
-
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thinker.auth.util.Redis;
-import com.thinker.auth.util.SecurityCode;
-import com.thinker.auth.util.SecurityImage;
 import com.thinker.creator.domain.ProcessResult;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
@@ -48,32 +42,32 @@ public class AuthCodeController {
 
 	}
 
-	@RequestMapping(value = "/securcode", method = RequestMethod.GET)
-	public void generateSecureCode(HttpServletRequest request,
-			HttpServletResponse response) throws Throwable {
-
-		ArdLog.info(logger, "enter generateSecureCode", null, null);
-
-		String securityCode = SecurityCode.getSecurityCode();
-
-		BufferedImage bufferedImage = SecurityImage.createImage(securityCode);
-
-		// 将四位数字的验证码保存到Session中。
-		Session session = SecurityUtils.getSubject().getSession();
-		session.setAttribute("code", securityCode);
-
-		// // 禁止图像缓存。
-		response.setHeader("Pragma", "no-cache");
-		response.setHeader("Cache-Control", "no-cache");
-		response.setDateHeader("Expires", 0);
-		response.setContentType("image/jpeg");
-		// 将图像输出到输出流中。
-		OutputStream os = response.getOutputStream();
-		ImageIO.write(bufferedImage, "jpeg", os);
-		os.close();
-		ArdLog.info(logger, "finish generateSecureCode", null, "securityCode: "
-				+ securityCode);
-	}
+//	@RequestMapping(value = "/securcode", method = RequestMethod.GET)
+//	public void generateSecureCode(HttpServletRequest request,
+//			HttpServletResponse response) throws Throwable {
+//
+//		ArdLog.info(logger, "enter generateSecureCode", null, null);
+//
+//		String securityCode = SecurityCode.getSecurityCode();
+//
+//		BufferedImage bufferedImage = SecurityImage.createImage(securityCode);
+//
+//		// 将四位数字的验证码保存到Session中。
+//		Session session = SecurityUtils.getSubject().getSession();
+//		session.setAttribute("code", securityCode);
+//
+//		// // 禁止图像缓存。
+//		response.setHeader("Pragma", "no-cache");
+//		response.setHeader("Cache-Control", "no-cache");
+//		response.setDateHeader("Expires", 0);
+//		response.setContentType("image/jpeg");
+//		// 将图像输出到输出流中。
+//		OutputStream os = response.getOutputStream();
+//		ImageIO.write(bufferedImage, "jpeg", os);
+//		os.close();
+//		ArdLog.info(logger, "finish generateSecureCode", null, "securityCode: "
+//				+ securityCode);
+//	}
 
 	/**
 	 * 向指定号码发送验证码
@@ -115,7 +109,7 @@ public class AuthCodeController {
 	 * @param smsCode
 	 * @return
 	 */
-	@RequestMapping(value = "/authentication", method = RequestMethod.GET)
+	@RequestMapping(value = "/authentication", method = RequestMethod.POST)
 	public ProcessResult authSmsCode(String telNumber, String smsCode) {
 		ArdLog.info(logger, "enter authSmsCode", null, smsCode);
 

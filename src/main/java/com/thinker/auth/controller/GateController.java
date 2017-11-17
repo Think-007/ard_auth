@@ -11,7 +11,6 @@ package com.thinker.auth.controller;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -66,7 +65,8 @@ import com.thinker.util.ArdLog;
 @RequestMapping("/auth/gate")
 public class GateController {
 
-	private static final Logger logger = LoggerFactory.getLogger(GateController.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(GateController.class);
 
 	// 随机盐值
 	@Value("${shiro.salt}")
@@ -96,7 +96,8 @@ public class GateController {
 	 */
 	@RequestMapping(value = "/registration", method = RequestMethod.POST)
 	public ProcessResult registUser(String registInfo, String smsCode) {
-		ArdLog.info(logger, "enter registUser ", null, "userRegistParam: " + registInfo + "smsCode: " + smsCode);
+		ArdLog.info(logger, "enter registUser ", null, "userRegistParam: "
+				+ registInfo + "smsCode: " + smsCode);
 		ProcessResult processResult = new ProcessResult();
 
 		try {
@@ -123,19 +124,15 @@ public class GateController {
 			}
 
 			// 2.密码加盐
-
-			ArdLog.debug(logger, "registUser", null, "salt: " + saltStr + "hashIterations: " + hashIterations);
-			System.out.println(saltStr);
-			System.out.println(hashIterations);
-
-			Md5Hash mh = new Md5Hash(userRegistParam.getPassword(), saltStr, hashIterations);
+			ArdLog.debug(logger, "registUser", null, "salt: " + saltStr
+					+ "hashIterations: " + hashIterations);
+			Md5Hash mh = new Md5Hash(userRegistParam.getPassword(), saltStr,
+					hashIterations);
 			System.out.println(mh.toString());
 			userRegistParam.setPassword(mh.toString());
 
 			// 3.创建用户,并绑定信息,默认roleid为0 ，是普通用户
-
 			ArdUserRole ardUserRole = new ArdUserRole();
-
 			userRegistService.regitsUser(userRegistParam, saltStr, ardUserRole);
 			// 删除smscode
 			Redis.redis.remove(telnum + "_auth");
@@ -163,7 +160,8 @@ public class GateController {
 			ArdLog.error(logger, "registUser error", null, null, t);
 			t.printStackTrace();
 		}
-		ArdLog.info(logger, "finish registUser ", null, "processresult: " + processResult);
+		ArdLog.info(logger, "finish registUser ", null, "processresult: "
+				+ processResult);
 
 		return processResult;
 	}
@@ -192,8 +190,8 @@ public class GateController {
 			String password = userInfo[1];
 			String deviceInfo = userInfo[2];
 
-			ArdLog.debug(logger, "doLogin", null,
-					" telnum : " + telnum + " password : " + password + " deviceInfo : " + deviceInfo);
+			ArdLog.debug(logger, "doLogin", null, " telnum : " + telnum
+					+ " password : " + password + " deviceInfo : " + deviceInfo);
 
 			// 1、用户认证
 			String msg = null;
@@ -204,32 +202,44 @@ public class GateController {
 
 					processResult.setRetCode(ProcessResult.SUCCESS);
 					processResult.setRetMsg("ok");
-					String loginToken = TokenUtil.generateToken(telnum);
+					// 保持长连接的token
+					String token = TokenUtil.generateToken();
+					// 自动登录令牌
+					String loginToken = TokenUtil.generateLoginToken(deviceInfo
+							+ telnum);
+					String retInfo = token + "_" + loginToken;
+
 					// 将token用客户端给公钥加密返回给客户端
-					String encryptToken = new String(
-							RSAEncrypt.encrypt(RSAEncrypt.loadPublicKeyByStr(publicKey), loginToken.getBytes()));
+					String encryptToken = new String(RSAEncrypt.encrypt(
+							RSAEncrypt.loadPublicKeyByStr(publicKey),
+							retInfo.getBytes()));
 					// 2、返回用户信息
-					UserInfoDetail userInfoDetail = userInfoService.getUserInfoDetailByTelNumber(telnum);
+					UserInfoDetail userInfoDetail = userInfoService
+							.getUserInfoDetailByTelNumber(telnum);
 
 					LoginResult loginResult = new LoginResult();
 					loginResult.setUserInfoDetail(userInfoDetail);
-					loginResult.setToken(loginToken);
+					loginResult.setToken(encryptToken);
 
 					processResult.setRetObj(loginResult);
 
 					// 3、存储token和用户信息
 
-					Redis.redis.put(userInfoDetail.getUserId(), loginToken);
+					Redis.redis.put(userInfoDetail.getUserId(), token);
+
+					Redis.redis.put(loginToken, userInfoDetail);
 
 				}
 
 			} catch (PassWordErrorException e) {
-				msg = "登录密码错误. Password for account " + telnum + " was incorrect.";
+				msg = "登录密码错误. Password for account " + telnum
+						+ " was incorrect.";
 				processResult.setRetCode(ArdError.PASSWORD_ERROR);
 				processResult.setRetMsg(msg);
 				System.out.println(msg);
 			} catch (UserLockException e) {
-				msg = "帐号已被锁定. The account for username " + telnum + " was disabled.";
+				msg = "帐号已被锁定. The account for username " + telnum
+						+ " was disabled.";
 				processResult.setRetCode(ArdError.USER_LOCKED);
 				processResult.setRetMsg(msg);
 				System.out.println(msg);
@@ -251,6 +261,60 @@ public class GateController {
 	}
 
 	/**
+	 * 自动登录接口
+	 * 
+	 * @param autoLoginInfo
+	 *            自动登录令牌用公钥加密
+	 * @return
+	 */
+	@RequestMapping(value = "/app_auto_authentication", method = RequestMethod.POST)
+	public ProcessResult autoLogin(String autoLoginInfo, String key) {
+
+		ArdLog.debug(logger, " enter autoLogin", null, " autoLoginInfo : "
+
+		+ autoLoginInfo);
+
+		ProcessResult processResult = new ProcessResult();
+
+		try {
+			// 解析请求参数
+			String[] reqInfo = authUserService.decryptReqStr(autoLoginInfo);
+			String loginToken = reqInfo[0];
+			UserInfoDetail userInfoDetail = (UserInfoDetail) Redis.redis
+					.get(loginToken);
+
+			// 长连接的token
+			String token = TokenUtil.generateToken();
+
+			String retInfo = token + "_" + loginToken;
+
+			// 将token用客户端给公钥加密返回给客户端
+			String encryptToken = new String(RSAEncrypt.encrypt(
+					RSAEncrypt.loadPublicKeyByStr(key), retInfo.getBytes()));
+
+			if (userInfoDetail != null) {
+
+				LoginResult loginResult = new LoginResult();
+				loginResult.setUserInfoDetail(userInfoDetail);
+				loginResult.setToken(encryptToken);
+				processResult.setRetCode(ProcessResult.SUCCESS);
+				processResult.setRetMsg("ok");
+				processResult.setRetObj(loginResult);
+			}
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+
+			processResult.setRetCode(ArdError.EXCEPTION);
+			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
+
+			e.printStackTrace();
+		}
+
+		return processResult;
+	}
+
+	/**
 	 * 忘记密码,申请公钥，将 电话号码_新密码 加密成resetInfo参数
 	 * 
 	 * @param request
@@ -258,8 +322,8 @@ public class GateController {
 	 * @return
 	 */
 	@RequestMapping(value = "/password_reset", method = RequestMethod.PUT)
-	public ProcessResult resetPassword(HttpServletRequest request, HttpServletResponse response, String resetInfo,
-			String smsCode) {
+	public ProcessResult resetPassword(HttpServletRequest request,
+			HttpServletResponse response, String resetInfo, String smsCode) {
 
 		ProcessResult processResult = new ProcessResult();
 
@@ -273,8 +337,10 @@ public class GateController {
 			String code = (String) Redis.redis.get(telNumber + "_auth");
 			if (code != null && code.equals(smsCode)) {
 				// 更改密码
-				ArdUser ardUser = userInfoService.getUserInfoByTelNumber(telNumber);
-				userInfoService.updateUserPassword(ardUser.getUserId(), newPassowrd);
+				ArdUser ardUser = userInfoService
+						.getUserInfoByTelNumber(telNumber);
+				userInfoService.updateUserPassword(ardUser.getUserId(),
+						newPassowrd);
 				// 删除smscode
 				Redis.redis.remove(telNumber + "_auth");
 				processResult.setRetCode(ProcessResult.SUCCESS);
@@ -302,8 +368,10 @@ public class GateController {
 	 * @return
 	 */
 	@RequestMapping("/tokenstatus")
-	public ProcessResult retTokenStatus(HttpServletRequest request, HttpServletResponse response) {
-		ProcessResult result = (ProcessResult) request.getAttribute("processResult");
+	public ProcessResult retTokenStatus(HttpServletRequest request,
+			HttpServletResponse response) {
+		ProcessResult result = (ProcessResult) request
+				.getAttribute("processResult");
 
 		ArdLog.debug(logger, "", "", "debug");
 		ArdLog.info(logger, "", "", "info");
@@ -313,8 +381,8 @@ public class GateController {
 	}
 
 	@RequestMapping("/testparam")
-	public ProcessResult testParam(HttpServletRequest request, HttpServletResponse response, String telNumber,
-			String a) {
+	public ProcessResult testParam(HttpServletRequest request,
+			HttpServletResponse response, String telNumber, String a) {
 
 		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
 

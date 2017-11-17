@@ -1,6 +1,7 @@
 package com.thinker.auth.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class ArdUserAccount implements Serializable {
 
@@ -17,6 +18,9 @@ public class ArdUserAccount implements Serializable {
 
 	// 余额
 	private double balance;
+
+	// 更新时间
+	private Date updateTime;
 
 	public String getUserId() {
 		return userId;
@@ -42,10 +46,19 @@ public class ArdUserAccount implements Serializable {
 		this.balance = balance;
 	}
 
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
 	@Override
 	public String toString() {
 		return "ArdUserAccount [userId=" + userId + ", accountType="
-				+ accountType + ", balance=" + balance + "]";
+				+ accountType + ", balance=" + balance + ", updateTime="
+				+ updateTime + "]";
 	}
 
 }

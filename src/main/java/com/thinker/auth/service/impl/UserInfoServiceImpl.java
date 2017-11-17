@@ -48,17 +48,22 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Override
 	public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber) {
 
-		UserInfoDetail userInfoDetail = ardUserMapper.queryArdUserDetailByTelNumber(telNumber);
+		UserInfoDetail userInfoDetail = ardUserMapper
+				.queryArdUserDetailByTelNumber(telNumber);
 
 		return userInfoDetail;
 	}
 
 	@Override
-	public int updateUserHeadPic(ArdUserAttach ardUserAttach) {
+	public ArdUserAttach updateUserHeadPic(String userId, String thumbURL,
+			String headPicURL) {
+		ArdUserAttach ardUserAttach = new ArdUserAttach();
+		ardUserAttach.setUserId(userId);
+		ardUserAttach.setThumbURL(thumbURL);
+		ardUserAttach.setHeadpicURL(headPicURL);
+		ardUserAttachMapper.updateUserAttach(ardUserAttach);
 
-		int result = ardUserAttachMapper.updateUserAttach(ardUserAttach);
-
-		return result;
+		return ardUserAttach;
 	}
 
 	@Override
@@ -79,7 +84,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	}
 
 	@Override
-	public int updateUserBm(String userId, String userName) throws Exception {
+	public ArdUserBm updateUserBm(String userId, String userName) throws Exception {
 		// TODO Auto-generated method stub
 
 		ArdUserBm bm = new ArdUserBm();
@@ -87,11 +92,25 @@ public class UserInfoServiceImpl implements UserInfoService {
 		bm.setUserName(userName);
 		int result;
 		try {
-			result = ardUserBmMapper.updateUseBm(bm);
+			result = ardUserBmMapper.updateUserBm(bm);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new UserNameRepeatException("昵称重复");
 		}
-		return result;
+		return bm;
 	}
+
+	@Override
+	public ArdUserAttach updaetTemNumberByUserId(String userId, String telNumber) {
+		// TODO Auto-generated method stub
+
+		ArdUserAttach ardUserAttach = new ArdUserAttach();
+
+		ardUserAttach.setUserId(userId);
+		ardUserAttach.setTelNum(telNumber);
+		ardUserAttachMapper.updateUserAttach(ardUserAttach);
+
+		return ardUserAttach;
+	}
+
 }
