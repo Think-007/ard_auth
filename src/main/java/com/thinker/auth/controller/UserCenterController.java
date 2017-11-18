@@ -239,7 +239,6 @@ public class UserCenterController {
 			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 
 			processResult.setRetCode(ArdError.EXCEPTION);
 			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
