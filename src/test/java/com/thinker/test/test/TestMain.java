@@ -25,8 +25,10 @@ public class TestMain {
 
 	public static void main(String[] args) {
 
-		char[] data = { '1', '2', '3' };
-		System.out.println(String.copyValueOf(data));
+//		char[] data = { '1', '2', '3' };
+//		System.out.println(String.copyValueOf(data));
+		
+		System.out.println(1<<4);
 	}
 
 }
