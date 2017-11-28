@@ -217,7 +217,7 @@ public class RSAEncrypt {
 		Cipher cipher = null;
 		try {
 			// 使用默认RSA
-			cipher = Cipher.getInstance("RSA");
+			cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			// cipher= Cipher.getInstance("RSA", new BouncyCastleProvider());
 			cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 			byte[] output = cipher.doFinal(plainTextData);
@@ -255,7 +255,7 @@ public class RSAEncrypt {
 		Cipher cipher = null;
 		try {
 			// 使用默认RSA
-			cipher = Cipher.getInstance("RSA");
+			cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			cipher.init(Cipher.ENCRYPT_MODE, privateKey);
 			byte[] output = cipher.doFinal(plainTextData);
 			return output;
@@ -292,7 +292,7 @@ public class RSAEncrypt {
 		Cipher cipher = null;
 		try {
 			// 使用默认RSA
-			cipher = Cipher.getInstance("RSA");
+			cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			// cipher= Cipher.getInstance("RSA", new BouncyCastleProvider());
 			cipher.init(Cipher.DECRYPT_MODE, privateKey);
 			byte[] output = cipher.doFinal(cipherData);
@@ -330,7 +330,7 @@ public class RSAEncrypt {
 		Cipher cipher = null;
 		try {
 			// 使用默认RSA
-			cipher = Cipher.getInstance("RSA");
+			cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			// cipher= Cipher.getInstance("RSA", new BouncyCastleProvider());
 			cipher.init(Cipher.DECRYPT_MODE, publicKey);
 			byte[] output = cipher.doFinal(cipherData);

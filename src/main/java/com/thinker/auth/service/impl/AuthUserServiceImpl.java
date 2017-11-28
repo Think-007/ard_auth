@@ -16,6 +16,7 @@ import com.thinker.auth.exception.UserLockException;
 import com.thinker.auth.exception.UserNotExistException;
 import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserInfoService;
+import com.thinker.security.Base64;
 import com.thinker.security.RSAEncrypt;
 import com.thinker.util.ArdLog;
 import com.thinker.util.CacheUtil;
@@ -85,10 +86,10 @@ public class AuthUserServiceImpl implements AuthUserService {
 	public String[] decryptReqStr(String encryptStr) throws Exception {
 
 		ArdLog.info(logger, "decryptReqStr", null, "密文 ： " + encryptStr);
-		String privateKey = CacheUtil.keyCache.get("privateKey");
+		String privateKey = CacheUtil.keyCache.get("privatekey");
 		String userInfoStr = new String(RSAEncrypt.decrypt(
 				RSAEncrypt.loadPrivateKeyByStr(privateKey),
-				encryptStr.getBytes()));
+				Base64.decode(encryptStr)));
 
 		String[] userInfo = userInfoStr.split("_");
 		return userInfo;

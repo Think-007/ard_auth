@@ -137,7 +137,7 @@ public class GateController {
 			// 删除smscode
 			Redis.redis.remove(telnum + "_auth");
 			processResult.setRetCode(ProcessResult.SUCCESS);
-			processResult.setRetMsg("ok");
+			processResult.setRetMsg("ok9");
 		} catch (UserNameRepeatException e) {
 
 			processResult.setRetCode(ArdError.NAME_REPEAT);

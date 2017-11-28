@@ -26,7 +26,8 @@ public class AuthCodeController {
 
 	@RequestMapping("/publickey")
 	public ProcessResult reqPublicKey() {
-
+		
+		ArdLog.debug(logger, "enter  reqPublicKey", null, null);
 		ProcessResult processResult = new ProcessResult();
 
 		String publicKey = CacheUtil.keyCache.get("publickey");
@@ -38,6 +39,7 @@ public class AuthCodeController {
 			processResult.setRetObj(publicKey);
 		}
 
+		ArdLog.debug(logger, "finish reqPublicKey", null, processResult);
 		return processResult;
 
 	}
