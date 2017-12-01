@@ -46,6 +46,7 @@ import com.thinker.auth.service.UserRegistService;
 import com.thinker.auth.util.Redis;
 import com.thinker.auth.util.TokenUtil;
 import com.thinker.creator.domain.ProcessResult;
+import com.thinker.security.Base64;
 import com.thinker.security.RSAEncrypt;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
@@ -95,7 +96,8 @@ public class GateController {
 	 * @return
 	 */
 	@RequestMapping(value = "/registration", method = RequestMethod.POST)
-	public ProcessResult registUser(String registInfo, String smsCode) {
+	public ProcessResult registUser(String registInfo, String smsCode,
+			String publicKey) {
 		ArdLog.info(logger, "enter registUser ", null, "userRegistParam: "
 				+ registInfo + "smsCode: " + smsCode);
 		ProcessResult processResult = new ProcessResult();
@@ -108,6 +110,7 @@ public class GateController {
 			String telnum = userInfo[0];
 			String password = userInfo[1];
 			String userName = userInfo[2];
+			String deviceInfo = userInfo[3];
 
 			UserRegistParam userRegistParam = new UserRegistParam();
 			userRegistParam.setTelNumber(telnum);
@@ -136,6 +139,10 @@ public class GateController {
 			userRegistService.regitsUser(userRegistParam, saltStr, ardUserRole);
 			// 删除smscode
 			Redis.redis.remove(telnum + "_auth");
+
+			// 4.登录
+			login(publicKey, processResult, telnum, deviceInfo);
+
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok9");
 		} catch (UserNameRepeatException e) {
@@ -164,6 +171,33 @@ public class GateController {
 				+ processResult);
 
 		return processResult;
+	}
+
+	private void login(String publicKey, ProcessResult processResult,
+			String telnum, String deviceInfo) throws Exception {
+		String token = TokenUtil.generateToken();
+		// 1.自动登录令牌
+		String loginToken = TokenUtil.generateLoginToken(deviceInfo + telnum);
+		String retInfo = token + "_" + loginToken;
+
+		// 将token用客户端给公钥加密返回给客户端
+		String encryptToken = Base64.encode((RSAEncrypt.encrypt(
+				RSAEncrypt.loadPublicKeyByStr(publicKey), retInfo.getBytes())));
+		// 2、返回用户信息
+		UserInfoDetail userInfoDetail = userInfoService
+				.getUserInfoDetailByTelNumber(telnum);
+
+		LoginResult loginResult = new LoginResult();
+		loginResult.setUserInfoDetail(userInfoDetail);
+		loginResult.setToken(encryptToken);
+
+		processResult.setRetObj(loginResult);
+
+		// 3、存储token和用户信息
+
+		Redis.redis.put(userInfoDetail.getUserId(), token);
+
+		Redis.redis.put(loginToken, userInfoDetail);
 	}
 
 	/**
@@ -202,33 +236,8 @@ public class GateController {
 
 					processResult.setRetCode(ProcessResult.SUCCESS);
 					processResult.setRetMsg("ok");
-					// 保持长连接的token
-					String token = TokenUtil.generateToken();
-					// 自动登录令牌
-					String loginToken = TokenUtil.generateLoginToken(deviceInfo
-							+ telnum);
-					String retInfo = token + "_" + loginToken;
-
-					// 将token用客户端给公钥加密返回给客户端
-					String encryptToken = new String(RSAEncrypt.encrypt(
-							RSAEncrypt.loadPublicKeyByStr(publicKey),
-							retInfo.getBytes()));
-					// 2、返回用户信息
-					UserInfoDetail userInfoDetail = userInfoService
-							.getUserInfoDetailByTelNumber(telnum);
-
-					LoginResult loginResult = new LoginResult();
-					loginResult.setUserInfoDetail(userInfoDetail);
-					loginResult.setToken(encryptToken);
-
-					processResult.setRetObj(loginResult);
-
-					// 3、存储token和用户信息
-
-					Redis.redis.put(userInfoDetail.getUserId(), token);
-
-					Redis.redis.put(loginToken, userInfoDetail);
-
+					// 2.登录
+					login(publicKey, processResult, telnum, deviceInfo);
 				}
 
 			} catch (PassWordErrorException e) {
@@ -314,6 +323,15 @@ public class GateController {
 		}
 
 		return processResult;
+	}
+
+	@RequestMapping("/third_auth")
+	public ProcessResult weichatLogin(String registInfo,String publicKey) {
+
+		ProcessResult result = new ProcessResult();
+
+		return result;
+
 	}
 
 	/**

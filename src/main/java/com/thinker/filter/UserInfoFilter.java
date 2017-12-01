@@ -11,18 +11,15 @@ import java.util.TreeMap;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thinker.auth.util.Redis;
-import com.thinker.creator.domain.ProcessResult;
-import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
 import com.thinker.util.MD5Util;
 
@@ -32,7 +29,7 @@ import com.thinker.util.MD5Util;
  * @author lipengfeia
  *
  */
-// @WebFilter(filterName = "usercenter", urlPatterns = "/**/filter/*")
+@WebFilter(filterName = "usercenter", urlPatterns = "/*/filter/*")
 public class UserInfoFilter implements Filter {
 
 	private static final Logger logger = LoggerFactory
@@ -49,47 +46,52 @@ public class UserInfoFilter implements Filter {
 	public void doFilter(ServletRequest arg0, ServletResponse arg1,
 			FilterChain arg2) throws IOException, ServletException {
 
-		HttpServletRequest request = (HttpServletRequest) arg0;
+		System.out.println("进入token 拦截器");
 
-		System.out.println("进入token拦截器");
-		ProcessResult processResult = new ProcessResult();
-		String uid = request.getHeader("uid");
-		String reqToken = request.getHeader("token");
-		String token = (String) Redis.redis.get(uid);
+		ArdLog.info(logger, "dofilter", null, "token filter 到了");
+		arg2.doFilter(arg0, arg1);
 
-		if (token == null || reqToken == null || !reqToken.equals(token)) {
-
-			System.out.println("token 不存在");
-
-			processResult.setRetCode(ArdError.TOKEN_TIME_OUT);
-			processResult.setRetMsg("token 过期");
-
-			request.setAttribute("processResult", processResult);
-
-			RequestDispatcher requestDispatcher = request
-					.getRequestDispatcher("/auth/gate/tokenstatus");
-			requestDispatcher.forward(arg0, arg1);
-
-		} else if (!authSign(request, token)) {
-
-			System.out.println("签名不合法");
-
-			processResult.setRetCode(ArdError.PARAM_ILLEGAL);
-			processResult.setRetMsg("签名不合法");
-
-			request.setAttribute("processResult", processResult);
-
-			RequestDispatcher requestDispatcher = request
-					.getRequestDispatcher("/auth/gate/tokenstatus");
-			requestDispatcher.forward(arg0, arg1);
-
-		} else {
-
-			processResult.setRetCode(ProcessResult.SUCCESS);
-			processResult.setRetMsg("ok");
-			arg2.doFilter(arg0, arg1);
-
-		}
+		// HttpServletRequest request = (HttpServletRequest) arg0;
+		//
+		// System.out.println("进入token拦截器");
+		// ProcessResult processResult = new ProcessResult();
+		// String uid = request.getHeader("uid");
+		// String reqToken = request.getHeader("token");
+		// String token = (String) Redis.redis.get(uid);
+		//
+		// if (token == null || reqToken == null || !reqToken.equals(token)) {
+		//
+		// System.out.println("token 不存在");
+		//
+		// processResult.setRetCode(ArdError.TOKEN_TIME_OUT);
+		// processResult.setRetMsg("token 过期");
+		//
+		// request.setAttribute("processResult", processResult);
+		//
+		// RequestDispatcher requestDispatcher = request
+		// .getRequestDispatcher("/auth/gate/tokenstatus");
+		// requestDispatcher.forward(arg0, arg1);
+		//
+		// } else if (!authSign(request, token)) {
+		//
+		// System.out.println("签名不合法");
+		//
+		// processResult.setRetCode(ArdError.PARAM_ILLEGAL);
+		// processResult.setRetMsg("签名不合法");
+		//
+		// request.setAttribute("processResult", processResult);
+		//
+		// RequestDispatcher requestDispatcher = request
+		// .getRequestDispatcher("/auth/gate/tokenstatus");
+		// requestDispatcher.forward(arg0, arg1);
+		//
+		// } else {
+		//
+		// processResult.setRetCode(ProcessResult.SUCCESS);
+		// processResult.setRetMsg("ok");
+		// arg2.doFilter(arg0, arg1);
+		//
+		// }
 
 	}
 

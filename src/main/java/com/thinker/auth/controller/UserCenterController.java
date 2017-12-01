@@ -85,6 +85,25 @@ public class UserCenterController {
 
 	}
 
+	@RequestMapping(value = "/settings", method = RequestMethod.GET)
+	public ProcessResult userSetting(HttpServletRequest request,
+			HttpServletResponse response) {
+		ArdLog.debug(logger, "enter settings", null, null);
+		;
+
+		ProcessResult processResult = new ProcessResult();
+
+		String userId = request.getHeader("uid");
+
+		userAccountService.updateUseAccountInfoByUseId(userId, bonus);
+
+		processResult.setRetCode(ProcessResult.SUCCESS);
+
+		ArdLog.debug(logger, "finish settings", null, processResult);
+		return processResult;
+
+	}
+
 	/**
 	 * 上传头像
 	 * 
