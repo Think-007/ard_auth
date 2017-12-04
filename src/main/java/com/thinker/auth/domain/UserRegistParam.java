@@ -17,6 +17,8 @@ public class UserRegistParam implements Serializable {
 	private String smsCode;
 	// 手机号
 	private String telNumber;
+	// 头像地址
+	private String headPicUrl = "固定值";
 
 	public String getUserName() {
 		return userName;
@@ -50,11 +52,19 @@ public class UserRegistParam implements Serializable {
 		this.smsCode = smsCode;
 	}
 
+	public String getHeadPicUrl() {
+		return headPicUrl;
+	}
+
+	public void setHeadPicUrl(String headPicUrl) {
+		this.headPicUrl = headPicUrl;
+	}
+
 	@Override
 	public String toString() {
 		return "UserRegistParam [userName=" + userName + ", password="
 				+ password + ", smsCode=" + smsCode + ", telNumber="
-				+ telNumber + "]";
+				+ telNumber + ", headPicUrl=" + headPicUrl + "]";
 	}
 
 }

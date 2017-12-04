@@ -12,7 +12,7 @@ public class ArdUserAttach implements Serializable {
 
 	// 用户id
 	private String userId;
-	// 用户电话
+	// 用户电话(第三方id)
 	private String telNum;
 	// 缩略图地址
 	private String thumbURL;

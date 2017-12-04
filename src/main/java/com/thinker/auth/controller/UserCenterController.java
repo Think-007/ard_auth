@@ -30,6 +30,7 @@ import com.thinker.auth.service.UserAccountService;
 import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.util.Redis;
 import com.thinker.creator.domain.ProcessResult;
+import com.thinker.util.ArdConst;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
 
@@ -328,7 +329,8 @@ public class UserCenterController {
 
 		// 判断短信码是否正确啊
 		if (smsCode == null
-				|| smsCode.equals(Redis.redis.get(telNumber + "_auth"))) {
+				|| smsCode.equals(Redis.redis.get(ArdConst.PROJECT_FLAG
+						+ telNumber + "_auth"))) {
 
 			processResult.setRetCode(ArdError.PARAM_ILLEGAL);
 
@@ -396,9 +398,9 @@ public class UserCenterController {
 	public void checkOut(HttpServletRequest request,
 			HttpServletResponse response) {
 
-		String uid = request.getHeader("uid");
+		String token = request.getHeader("token");
 		// app还要删除token
-		Redis.redis.remove(uid);
+		Redis.redis.remove(ArdConst.PROJECT_FLAG + token);
 
 	}
 

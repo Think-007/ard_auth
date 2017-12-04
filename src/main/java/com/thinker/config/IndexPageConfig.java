@@ -1,4 +1,4 @@
-package com.thinker.auth.config;
+package com.thinker.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;

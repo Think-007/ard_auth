@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thinker.auth.util.Redis;
 import com.thinker.creator.domain.ProcessResult;
+import com.thinker.util.ArdConst;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
 import com.thinker.util.CacheUtil;
@@ -44,33 +45,6 @@ public class AuthCodeController {
 
 	}
 
-//	@RequestMapping(value = "/securcode", method = RequestMethod.GET)
-//	public void generateSecureCode(HttpServletRequest request,
-//			HttpServletResponse response) throws Throwable {
-//
-//		ArdLog.info(logger, "enter generateSecureCode", null, null);
-//
-//		String securityCode = SecurityCode.getSecurityCode();
-//
-//		BufferedImage bufferedImage = SecurityImage.createImage(securityCode);
-//
-//		// 将四位数字的验证码保存到Session中。
-//		Session session = SecurityUtils.getSubject().getSession();
-//		session.setAttribute("code", securityCode);
-//
-//		// // 禁止图像缓存。
-//		response.setHeader("Pragma", "no-cache");
-//		response.setHeader("Cache-Control", "no-cache");
-//		response.setDateHeader("Expires", 0);
-//		response.setContentType("image/jpeg");
-//		// 将图像输出到输出流中。
-//		OutputStream os = response.getOutputStream();
-//		ImageIO.write(bufferedImage, "jpeg", os);
-//		os.close();
-//		ArdLog.info(logger, "finish generateSecureCode", null, "securityCode: "
-//				+ securityCode);
-//	}
-
 	/**
 	 * 向指定号码发送验证码
 	 * 
@@ -93,8 +67,8 @@ public class AuthCodeController {
 			session.setAttribute("smscode", smsCode);
 		} else {
 
-			Redis.redis.put(telNumber, smsCode);
-			Redis.redis.put(telNumber + "_auth", smsCode);
+			Redis.redis.put(ArdConst.PROJECT_FLAG+telNumber, smsCode);
+			Redis.redis.put(ArdConst.PROJECT_FLAG+telNumber + "_auth", smsCode);
 
 		}
 
@@ -117,13 +91,13 @@ public class AuthCodeController {
 
 		ProcessResult processResult = new ProcessResult();
 
-		String code = (String) Redis.redis.get(telNumber);
+		String code = (String) Redis.redis.get(ArdConst.PROJECT_FLAG+telNumber);
 
 		// 校验短信验证码是否正确
 		if (smsCode != null && smsCode.equals(code)) {
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
-			Redis.redis.remove(telNumber);
+			Redis.redis.remove(ArdConst.PROJECT_FLAG+telNumber);
 		} else {
 			processResult.setRetCode(ArdError.SMS_CODE_ERROR);
 			processResult.setRetMsg("验证码错误");

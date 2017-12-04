@@ -45,7 +45,7 @@ public class UserRegistServiceImpl implements UserRegistService {
 	@Override
 	@Transactional
 	public void regitsUser(UserRegistParam userRegistParam, String salt,
-			ArdUserRole ardUserRole) throws Exception {
+			int roleId, int regitsType) throws Exception {
 
 		// 1.分配用户uid
 		String userId = (new Double(Math.random() * 1000000000)).longValue()
@@ -66,8 +66,8 @@ public class UserRegistServiceImpl implements UserRegistService {
 		ArdUserAttach ardUserAttach = new ArdUserAttach();
 		ardUserAttach.setUserId(userId);
 		ardUserAttach.setTelNum(userRegistParam.getTelNumber());
-		ardUserAttach.setThumbURL("固定值");
-		ardUserAttach.setHeadpicURL("固定值");
+		ardUserAttach.setThumbURL(userRegistParam.getHeadPicUrl());
+		ardUserAttach.setHeadpicURL(userRegistParam.getHeadPicUrl());
 		ardUserAttach.setCreateTime(createTime);
 		try {
 			ardUserAttachMapper.insertUserAttach(ardUserAttach);
@@ -77,7 +77,9 @@ public class UserRegistServiceImpl implements UserRegistService {
 		}
 
 		// 4.定位用户角色为普通用户
+		ArdUserRole ardUserRole = new ArdUserRole();
 		ardUserRole.setUserId(userId);
+		ardUserRole.setRoleId(roleId);
 		ardUserRole.setCreateTime(createTime);
 		ardUserRoleMapper.insertAruUserRole(ardUserRole);
 
@@ -97,6 +99,63 @@ public class UserRegistServiceImpl implements UserRegistService {
 
 		ardUserMapper.insertArdUser(ardUser);
 
+	}
+
+	@Override
+	public void thirdRegistUser(UserRegistParam userRegistParam, String salt,
+			int roleId) throws Exception {
+		// 1.分配用户uid
+		String userId = (new Double(Math.random() * 1000000000)).longValue()
+				+ "";
+		Date createTime = Calendar.getInstance().getTime();
+		// 2 .创建用户别名
+		ArdUserBm ardUserBm = new ArdUserBm();
+		ardUserBm.setUserId(userId);
+		ardUserBm.setUserName(userRegistParam.getUserName() + Math.random()
+				* 10000);
+		ardUserBm.setCreateTime(createTime);
+		try {
+			ardUserBmMapper.insertUserBm(ardUserBm);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new UserNameRepeatException("用户名重复");
+		}
+		// 3.绑定用户电话信息
+		ArdUserAttach ardUserAttach = new ArdUserAttach();
+		ardUserAttach.setUserId(userId);
+		ardUserAttach.setTelNum(userRegistParam.getTelNumber());
+		ardUserAttach.setThumbURL(userRegistParam.getHeadPicUrl());
+		ardUserAttach.setHeadpicURL(userRegistParam.getHeadPicUrl());
+		ardUserAttach.setCreateTime(createTime);
+		try {
+			ardUserAttachMapper.insertUserAttach(ardUserAttach);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			throw new TelNumberRepeatException("手机号重复");
+		}
+
+		// 4.定位用户角色为普通用户
+		ArdUserRole ardUserRole = new ArdUserRole();
+		ardUserRole.setUserId(userId);
+		ardUserRole.setRoleId(roleId);
+		ardUserRole.setCreateTime(createTime);
+		ardUserRoleMapper.insertAruUserRole(ardUserRole);
+
+		// 5.开通用户的积分账户
+		ArdUserAccount ardUserAccount = new ArdUserAccount();
+		ardUserAccount.setUserId(userId);
+		ardUserAccount.setBalance(0);
+		ardUserAccount.setAccountType(ArdConst.BONUS);
+		ardUserAccountMapper.insertArdUserAccount(ardUserAccount);
+
+		// 6.注册用户
+		ArdUser ardUser = new ArdUser();
+		ardUser.setUserId(userId);
+		ardUser.setPassword(userRegistParam.getPassword());
+		ardUser.setSalt(salt);
+		ardUser.setCreateTime(createTime);
+
+		ardUserMapper.insertArdUser(ardUser);
 	}
 
 }

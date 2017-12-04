@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.thinker.auth.controller.AuthCodeController;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.exception.PassWordErrorException;
 import com.thinker.auth.exception.UserLockException;
@@ -19,8 +18,8 @@ import com.thinker.auth.service.UserInfoService;
 import com.thinker.security.Base64;
 import com.thinker.security.RSAEncrypt;
 import com.thinker.util.ArdLog;
+import com.thinker.util.ArdUserConst;
 import com.thinker.util.CacheUtil;
-import com.thinker.util.UserStatus;
 
 @Service
 public class AuthUserServiceImpl implements AuthUserService {
@@ -44,10 +43,10 @@ public class AuthUserServiceImpl implements AuthUserService {
 			throw new UserNotExistException("用户不存在");
 		}
 		switch (ardUser.getStatus()) {
-		case UserStatus.USER_LOCKED:
+		case ArdUserConst.USER_LOCKED:
 			throw new UserLockException("用户已被锁定");
 
-		case UserStatus.USER_LOGOUT:
+		case ArdUserConst.USER_LOGOUT:
 			throw new UserLockException("用户已被锁定");
 
 		default:

@@ -48,8 +48,10 @@ import com.thinker.auth.util.TokenUtil;
 import com.thinker.creator.domain.ProcessResult;
 import com.thinker.security.Base64;
 import com.thinker.security.RSAEncrypt;
+import com.thinker.util.ArdConst;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
+import com.thinker.util.ArdUserConst;
 
 /**
  * 
@@ -89,7 +91,7 @@ public class GateController {
 	private UserInfoService userInfoService;
 
 	/**
-	 * 用户注册接口 手机号_密码_昵称
+	 * 用户注册接口 手机号_密码_昵称_设备号
 	 * 
 	 * @param registInfo
 	 * @param smsCode
@@ -104,7 +106,7 @@ public class GateController {
 
 		try {
 
-			// 解析用户注册信息密文
+			// 1.解析用户注册信息密文
 			String[] userInfo = authUserService.decryptReqStr(registInfo);
 
 			String telnum = userInfo[0];
@@ -117,8 +119,9 @@ public class GateController {
 			userRegistParam.setPassword(password);
 			userRegistParam.setUserName(userName);
 
-			// 1.校验登录信息
-			String redisSmsCode = (String) Redis.redis.get(telnum + "_auth");
+			// 2.校验登录信息
+			String redisSmsCode = (String) Redis.redis
+					.get(ArdConst.PROJECT_FLAG + telnum + "_auth");
 
 			if (smsCode == null || !smsCode.equals(redisSmsCode)) {
 
@@ -126,7 +129,7 @@ public class GateController {
 				return processResult;
 			}
 
-			// 2.密码加盐
+			// 3.密码加盐
 			ArdLog.debug(logger, "registUser", null, "salt: " + saltStr
 					+ "hashIterations: " + hashIterations);
 			Md5Hash mh = new Md5Hash(userRegistParam.getPassword(), saltStr,
@@ -134,32 +137,25 @@ public class GateController {
 			System.out.println(mh.toString());
 			userRegistParam.setPassword(mh.toString());
 
-			// 3.创建用户,并绑定信息,默认roleid为0 ，是普通用户
-			ArdUserRole ardUserRole = new ArdUserRole();
-			userRegistService.regitsUser(userRegistParam, saltStr, ardUserRole);
+			// 4.创建用户,并绑定信息,默认roleid为0 ，是普通用户
+			userRegistService.regitsUser(userRegistParam, saltStr,
+					ArdUserConst.NORMAL_USER);
 			// 删除smscode
-			Redis.redis.remove(telnum + "_auth");
+			Redis.redis.remove(ArdConst.PROJECT_FLAG + telnum + "_auth");
 
-			// 4.登录
+			// 5.登录
 			login(publicKey, processResult, telnum, deviceInfo);
 
 			processResult.setRetCode(ProcessResult.SUCCESS);
-			processResult.setRetMsg("ok9");
+			processResult.setRetMsg("ok");
 		} catch (UserNameRepeatException e) {
 
 			processResult.setRetCode(ArdError.NAME_REPEAT);
 			processResult.setRetMsg("昵称重复");
-			// ArdLog.error(logger, "registUser error username used", null,
-			// null,
-			// e);
-			// e.printStackTrace();
 		} catch (TelNumberRepeatException e1) {
 
 			processResult.setRetCode(ArdError.TEL_NUM_REGISTED);
 			processResult.setRetMsg("号码已注册");
-			// ArdLog.error(logger, "registUser error telnum used", null, null,
-			// e1);
-			// e1.printStackTrace();
 
 		} catch (Throwable t) {
 			processResult.setRetCode(ArdError.EXCEPTION);
@@ -175,12 +171,11 @@ public class GateController {
 
 	private void login(String publicKey, ProcessResult processResult,
 			String telnum, String deviceInfo) throws Exception {
+		// 1.生成token和自动登录令牌
 		String token = TokenUtil.generateToken();
-		// 1.自动登录令牌
 		String loginToken = TokenUtil.generateLoginToken(deviceInfo + telnum);
 		String retInfo = token + "_" + loginToken;
-
-		// 将token用客户端给公钥加密返回给客户端
+		// 将token用客户端给公钥加密
 		String encryptToken = Base64.encode((RSAEncrypt.encrypt(
 				RSAEncrypt.loadPublicKeyByStr(publicKey), retInfo.getBytes())));
 		// 2、返回用户信息
@@ -195,9 +190,9 @@ public class GateController {
 
 		// 3、存储token和用户信息
 
-		Redis.redis.put(userInfoDetail.getUserId(), token);
+		Redis.redis.put(ArdConst.PROJECT_FLAG + token, loginResult);
 
-		Redis.redis.put(loginToken, userInfoDetail);
+		Redis.redis.put(ArdConst.PROJECT_FLAG + loginToken, userInfoDetail);
 	}
 
 	/**
@@ -212,10 +207,13 @@ public class GateController {
 	@RequestMapping(value = "/app_authentication", method = RequestMethod.POST)
 	public ProcessResult doLogin(String loginInfo, String key) {
 
+		ArdLog.info(logger, "enter doLogin ", null, "loginInfo : " + loginInfo
+				+ " key : " + key);
+
 		ProcessResult processResult = new ProcessResult();
 
 		try {
-			// 解析用户登录信息密文
+			// 1.解析用户登录信息密文
 			String[] userInfo = authUserService.decryptReqStr(loginInfo);
 			// 客户端公钥
 			String publicKey = key;
@@ -227,7 +225,7 @@ public class GateController {
 			ArdLog.debug(logger, "doLogin", null, " telnum : " + telnum
 					+ " password : " + password + " deviceInfo : " + deviceInfo);
 
-			// 1、用户认证
+			// 2、用户认证
 			String msg = null;
 
 			try {
@@ -236,7 +234,7 @@ public class GateController {
 
 					processResult.setRetCode(ProcessResult.SUCCESS);
 					processResult.setRetMsg("ok");
-					// 2.登录
+					// 3.登录
 					login(publicKey, processResult, telnum, deviceInfo);
 				}
 
@@ -266,6 +264,7 @@ public class GateController {
 			t.printStackTrace();
 		}
 
+		ArdLog.info(logger, "finish dologin", null, processResult);
 		return processResult;
 	}
 
@@ -279,7 +278,7 @@ public class GateController {
 	@RequestMapping(value = "/app_auto_authentication", method = RequestMethod.POST)
 	public ProcessResult autoLogin(String autoLoginInfo, String key) {
 
-		ArdLog.debug(logger, " enter autoLogin", null, " autoLoginInfo : "
+		ArdLog.info(logger, " enter autoLogin", null, " autoLoginInfo : "
 
 		+ autoLoginInfo);
 
@@ -290,7 +289,7 @@ public class GateController {
 			String[] reqInfo = authUserService.decryptReqStr(autoLoginInfo);
 			String loginToken = reqInfo[0];
 			UserInfoDetail userInfoDetail = (UserInfoDetail) Redis.redis
-					.get(loginToken);
+					.get(ArdConst.PROJECT_FLAG + loginToken);
 
 			// 长连接的token
 			String token = TokenUtil.generateToken();
@@ -313,24 +312,50 @@ public class GateController {
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
 			processResult.setRetObj(loginResult);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		} catch (Throwable t) {
 
 			processResult.setRetCode(ArdError.EXCEPTION);
 			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
+			t.printStackTrace();
+			ArdLog.error(logger, "app auto login error", null, processResult, t);
+		}
+		ArdLog.info(logger, " finish autoLogin", null, processResult);
+		return processResult;
+	}
 
+	/**
+	 * 第三方登录接口 第三方id_用户名_设备号_头像地址
+	 * 
+	 * @param thirdInfo
+	 *            加密后的登录信息
+	 * @param key
+	 *            客户端公钥
+	 * @param type
+	 *            登录类型 (微博、微信、qq)
+	 * @return
+	 */
+	@RequestMapping("/third_auth")
+	public ProcessResult thirdLogin(String thirdInfo, String key, int type) {
+
+		ArdLog.info(logger, "enter thirdLogin ", null, " thirdinfo : "
+				+ thirdInfo + " publickey : " + key);
+
+		ProcessResult processResult = new ProcessResult();
+		try {
+			// 1.获取注册信息.
+			String[] userInfo = authUserService.decryptReqStr(thirdInfo);
+			String thirdId = userInfo[0];
+			String userName = userInfo[1];
+			String deviceInfo = userInfo[2];
+			String headUrl = userInfo[3];
+			// 2.查看是否存在,如果存在直接返回登录信息
+			// 3.不存在，注册开户.并返回登录信息
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return processResult;
-	}
-
-	@RequestMapping("/third_auth")
-	public ProcessResult weichatLogin(String registInfo,String publicKey) {
-
-		ProcessResult result = new ProcessResult();
-
-		return result;
 
 	}
 
@@ -354,7 +379,8 @@ public class GateController {
 			String telNumber = reqInfo[0];
 			String newPassowrd = reqInfo[1];
 
-			String code = (String) Redis.redis.get(telNumber + "_auth");
+			String code = (String) Redis.redis.get(ArdConst.PROJECT_FLAG
+					+ telNumber + "_auth");
 			if (code != null && code.equals(smsCode)) {
 				// 更改密码
 				ArdUser ardUser = userInfoService
@@ -362,7 +388,7 @@ public class GateController {
 				userInfoService.updateUserPassword(ardUser.getUserId(),
 						newPassowrd);
 				// 删除smscode
-				Redis.redis.remove(telNumber + "_auth");
+				Redis.redis.remove(ArdConst.PROJECT_FLAG + telNumber + "_auth");
 				processResult.setRetCode(ProcessResult.SUCCESS);
 				processResult.setRetMsg("ok");
 			} else {
