@@ -23,6 +23,7 @@ import com.thinker.auth.exception.TelNumberRepeatException;
 import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.service.UserRegistService;
 import com.thinker.util.ArdConst;
+import com.thinker.util.ArdUserConst;
 
 @Service
 public class UserRegistServiceImpl implements UserRegistService {
@@ -44,17 +45,20 @@ public class UserRegistServiceImpl implements UserRegistService {
 
 	@Override
 	@Transactional
-	public void regitsUser(UserRegistParam userRegistParam, String salt,
-			int roleId, int regitsType) throws Exception {
+	public void regitsUser(UserRegistParam userRegistParam, String salt, int roleId, int regitsType) throws Exception {
 
 		// 1.分配用户uid
-		String userId = (new Double(Math.random() * 1000000000)).longValue()
-				+ "";
+		String userId = (new Double(Math.random() * 1000000000)).longValue() + "";
 		Date createTime = Calendar.getInstance().getTime();
 		// 2 .创建用户别名
 		ArdUserBm ardUserBm = new ArdUserBm();
 		ardUserBm.setUserId(userId);
-		ardUserBm.setUserName(userRegistParam.getUserName());
+		// 如果不是手机号注册，要在后面加随机数
+		if (regitsType == ArdUserConst.PHONE) {
+			ardUserBm.setUserName(userRegistParam.getUserName());
+		} else {
+			ardUserBm.setUserName(userRegistParam.getUserName() + Math.random() * 10000);
+		}
 		ardUserBm.setCreateTime(createTime);
 		try {
 			ardUserBmMapper.insertUserBm(ardUserBm);
@@ -70,13 +74,30 @@ public class UserRegistServiceImpl implements UserRegistService {
 		ardUserAttach.setHeadpicURL(userRegistParam.getHeadPicUrl());
 		ardUserAttach.setCreateTime(createTime);
 		try {
-			ardUserAttachMapper.insertUserAttach(ardUserAttach);
+			switch (regitsType) {
+			case ArdUserConst.PHONE:
+				ardUserAttachMapper.insertUserAttach(ardUserAttach);
+				break;
+			case ArdUserConst.WEICHAT:
+				ardUserAttachMapper.insertUserAttach(ardUserAttach);
+				break;
+			case ArdUserConst.QQ:
+				ardUserAttachMapper.insertUserAttach(ardUserAttach);
+				break;
+			case ArdUserConst.SINA:
+				ardUserAttachMapper.insertUserAttach(ardUserAttach);
+				break;
+
+			default:
+				break;
+			}
+
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			throw new TelNumberRepeatException("手机号重复");
+			throw new TelNumberRepeatException("手机号或者为uid重复");
 		}
 
-		// 4.定位用户角色为普通用户
+		// 4.定位用户角色
 		ArdUserRole ardUserRole = new ArdUserRole();
 		ardUserRole.setUserId(userId);
 		ardUserRole.setRoleId(roleId);
@@ -102,17 +123,14 @@ public class UserRegistServiceImpl implements UserRegistService {
 	}
 
 	@Override
-	public void thirdRegistUser(UserRegistParam userRegistParam, String salt,
-			int roleId) throws Exception {
+	public void thirdRegistUser(UserRegistParam userRegistParam, String salt, int roleId) throws Exception {
 		// 1.分配用户uid
-		String userId = (new Double(Math.random() * 1000000000)).longValue()
-				+ "";
+		String userId = (new Double(Math.random() * 1000000000)).longValue() + "";
 		Date createTime = Calendar.getInstance().getTime();
 		// 2 .创建用户别名
 		ArdUserBm ardUserBm = new ArdUserBm();
 		ardUserBm.setUserId(userId);
-		ardUserBm.setUserName(userRegistParam.getUserName() + Math.random()
-				* 10000);
+		ardUserBm.setUserName(userRegistParam.getUserName() + Math.random() * 10000);
 		ardUserBm.setCreateTime(createTime);
 		try {
 			ardUserBmMapper.insertUserBm(ardUserBm);

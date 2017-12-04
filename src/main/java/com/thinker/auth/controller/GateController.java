@@ -139,7 +139,7 @@ public class GateController {
 
 			// 4.创建用户,并绑定信息,默认roleid为0 ，是普通用户
 			userRegistService.regitsUser(userRegistParam, saltStr,
-					ArdUserConst.NORMAL_USER);
+					ArdUserConst.NORMAL_USER,ArdUserConst.PHONE);
 			// 删除smscode
 			Redis.redis.remove(ArdConst.PROJECT_FLAG + telnum + "_auth");
 
