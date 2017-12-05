@@ -22,6 +22,12 @@ public interface ArdError {
 	public static final int SMS_CODE_ERROR = 10006;
 	// 电话号码已经注册
 	public static final int TEL_NUM_REGISTED = 10007;
+	// 微信已经绑定
+	public static final int WEI_CHAT_REGISTED = 10008;
+	// qq已被绑定
+	public static final int QQ_REGISTED = 10009;
+	// 微博已经被绑定
+	public static final int SINA_REGISTED = 10010;
 
 	// ******************拦截请求错误********************
 

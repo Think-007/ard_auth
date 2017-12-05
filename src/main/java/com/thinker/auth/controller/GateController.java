@@ -31,15 +31,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thinker.auth.domain.ArdUser;
-import com.thinker.auth.domain.ArdUserRole;
 import com.thinker.auth.domain.UserInfoDetail;
 import com.thinker.auth.domain.UserRegistParam;
 import com.thinker.auth.domain.result.LoginResult;
 import com.thinker.auth.exception.PassWordErrorException;
+import com.thinker.auth.exception.QqRepeatException;
+import com.thinker.auth.exception.SinaRepeatException;
 import com.thinker.auth.exception.TelNumberRepeatException;
 import com.thinker.auth.exception.UserLockException;
 import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.exception.UserNotExistException;
+import com.thinker.auth.exception.WeiChatRepeatException;
 import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.service.UserRegistService;
@@ -139,7 +141,7 @@ public class GateController {
 
 			// 4.创建用户,并绑定信息,默认roleid为0 ，是普通用户
 			userRegistService.regitsUser(userRegistParam, saltStr,
-					ArdUserConst.NORMAL_USER,ArdUserConst.PHONE);
+					ArdUserConst.NORMAL_USER, ArdUserConst.PHONE);
 			// 删除smscode
 			Redis.redis.remove(ArdConst.PROJECT_FLAG + telnum + "_auth");
 
@@ -348,11 +350,51 @@ public class GateController {
 			String userName = userInfo[1];
 			String deviceInfo = userInfo[2];
 			String headUrl = userInfo[3];
-			// 2.查看是否存在,如果存在直接返回登录信息
-			// 3.不存在，注册开户.并返回登录信息
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// 2.查看是否存在,如果不存在就注册
+			UserInfoDetail userInfoDetail = userInfoService
+					.getUserInfoDetailByTelNumber(thirdId);
+			if (userInfoDetail == null) {
+				UserRegistParam userRegistParam = new UserRegistParam();
+				userRegistParam.setTelNumber(thirdId);
+				userRegistParam.setUserName(userName);
+				userRegistParam.setHeadPicUrl(headUrl);
+				userRegistParam.setPassword("123456");
+				// 3.密码加盐
+				ArdLog.debug(logger, "third registUser", null, "salt: "
+						+ saltStr + "hashIterations: " + hashIterations);
+				Md5Hash mh = new Md5Hash(userRegistParam.getPassword(),
+						saltStr, hashIterations);
+				System.out.println(mh.toString());
+				userRegistParam.setPassword(mh.toString());
+				// 4.注册用户
+				userRegistService.regitsUser(userRegistParam, saltStr,
+						ArdUserConst.NORMAL_USER, type);
+			}
+			// 5.登录
+			login(key, processResult, thirdId, deviceInfo);
+			processResult.setRetCode(ProcessResult.SUCCESS);
+			processResult.setRetMsg("ok");
+
+		} catch (UserNameRepeatException e) {
+			processResult.setRetCode(ArdError.NAME_REPEAT);
+			processResult.setRetMsg("昵称重复");
+		} catch (TelNumberRepeatException e1) {
+			processResult.setRetCode(ArdError.TEL_NUM_REGISTED);
+			processResult.setRetMsg("号码已注册");
+		} catch (WeiChatRepeatException e2) {
+			processResult.setRetCode(ArdError.WEI_CHAT_REGISTED);
+			processResult.setRetMsg("微信已经被绑定");
+		} catch (QqRepeatException e3) {
+			processResult.setRetCode(ArdError.QQ_REGISTED);
+			processResult.setRetMsg("QQ已经被绑定");
+		} catch (SinaRepeatException e3) {
+			processResult.setRetCode(ArdError.SINA_REGISTED);
+			processResult.setRetMsg("微博已经被绑定");
+		} catch (Throwable t) {
+			processResult.setRetCode(ArdError.EXCEPTION);
+			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
+			ArdLog.error(logger, "registUser error", null, null, t);
+			t.printStackTrace();
 		}
 
 		return processResult;

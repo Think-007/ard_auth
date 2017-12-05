@@ -20,6 +20,4 @@ public interface UserRegistService {
 	public void regitsUser(UserRegistParam userRegistParam, String salt,
 			int roleId, int regitsType) throws Exception;
 
-	public void thirdRegistUser(UserRegistParam userRegistParam, String salt,
-			int roleId) throws Exception;
 }
