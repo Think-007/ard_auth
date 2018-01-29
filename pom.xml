@@ -109,10 +109,10 @@
 	</dependencies>
 
 	<build>
-		<!-- <plugins> <plugin> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-maven-plugin</artifactId> 
-			</plugin> </plugins> -->
+		<plugins> <plugin> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-maven-plugin</artifactId> 
+			</plugin> </plugins>
 
-		<plugins>
+<!-- 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -141,7 +141,7 @@
 				<directory>${project.basedir}/src/main/resources</directory>
 				<targetPath>BOOT-INF/classes/</targetPath>
 			</resource>
-		</resources>
+		</resources> -->
 
 	</build>
 </project>
