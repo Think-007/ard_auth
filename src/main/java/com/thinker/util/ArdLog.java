@@ -25,9 +25,11 @@ import org.slf4j.Logger;
 
 public final class ArdLog {
 
-	private static final String HEAD_INFO = "ARD--------> :";
+	private static final String HEAD_INFO = "ARD-------->: metheod is ";
 
-	private static final String MID_INFO = "   obj===:";
+	private static final String SECOND_INFO = ", mainId is ";
+
+	private static final String MID_INFO = ",   obj===:";
 
 	private ArdLog() {
 
@@ -36,21 +38,24 @@ public final class ArdLog {
 	public static void info(Logger logger, String methodName, String mainID,
 			Object obj) {
 
-		logger.info(HEAD_INFO + methodName + " " + mainID + MID_INFO + obj);
+		logger.info(HEAD_INFO + methodName + SECOND_INFO + mainID + MID_INFO
+				+ obj);
 
 	}
 
 	public static void debug(Logger logger, String methodName, String mainID,
 			Object obj) {
 
-		logger.debug(HEAD_INFO + methodName + " " + mainID + MID_INFO + obj);
+		logger.debug(HEAD_INFO + methodName + SECOND_INFO + mainID + MID_INFO
+				+ obj);
 
 	}
 
 	public static void error(Logger logger, String methodName, String mainID,
 			Object obj, Throwable t) {
 
-		logger.error(HEAD_INFO + methodName + " " + mainID + MID_INFO + obj, t);
+		logger.error(HEAD_INFO + methodName + SECOND_INFO + mainID + MID_INFO
+				+ obj, t);
 
 	}
 

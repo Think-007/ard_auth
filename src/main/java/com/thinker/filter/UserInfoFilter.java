@@ -37,7 +37,6 @@ public class UserInfoFilter implements Filter {
 
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
 		ArdLog.info(logger, "destroy", null, "token filter 结束");
 
 	}
@@ -151,7 +150,6 @@ public class UserInfoFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig arg0) throws ServletException {
-		// TODO Auto-generated method stub
 
 		ArdLog.info(logger, "init", null, "token filter 初始化");
 	}

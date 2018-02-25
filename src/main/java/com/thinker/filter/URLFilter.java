@@ -26,8 +26,7 @@ public class URLFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
-		// TODO Auto-generated method stub
-		ArdLog.info(logger, "init", null, "url filter 初始化");
+		ArdLog.info(logger, "init", null, "url filter init");
 	}
 
 	@Override
@@ -36,13 +35,13 @@ public class URLFilter implements Filter {
 
 		HttpServletRequest request = (HttpServletRequest) arg0;
 
-		System.out.println("进入url拦截器");
+		ArdLog.debug(logger, "doFilter", null, "enter url interceptor");
 		ProcessResult processResult = new ProcessResult();
 		String timeStamp = request.getParameter("timeStamp");
 
 		if (System.currentTimeMillis() - Long.parseLong(timeStamp) > 600 * 1000) {
 
-			System.out.println("url 过期");
+			ArdLog.debug(logger, "doFilter", null, "url is time out");
 
 			processResult.setRetCode(ArdError.URL_TIME_OUT);
 			processResult.setRetMsg("url 过期");
@@ -56,14 +55,14 @@ public class URLFilter implements Filter {
 			processResult.setRetMsg("ok");
 			arg2.doFilter(arg0, arg1);
 		}
+		ArdLog.debug(logger, "doFilter", null, "finish url interceptor");
 
 	}
 
 	@Override
 	public void destroy() {
-		// TODO Auto-generated method stub
 
-		ArdLog.info(logger, "destroy", null, "url filter 结束");
+		ArdLog.info(logger, "destroy", null, "url filter destroy");
 
 	}
 
