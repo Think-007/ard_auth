@@ -9,11 +9,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.thinker.auth.dao.MysqlMapper;
 import com.thinker.easylife.dao.EasyLifeMapper;
+import com.thinker.video.dao.ArdVideoMapper;
 
 @SpringBootApplication
 @EnableTransactionManagement
 @ServletComponentScan
-@MapperScan(basePackageClasses = { MysqlMapper.class, EasyLifeMapper.class })
+@MapperScan(basePackageClasses = { MysqlMapper.class, EasyLifeMapper.class,
+		ArdVideoMapper.class })
 // @ImportResource({ "classpath:redis/spring-redis-cluster.xml",
 // "classpath:hessian/hessian-client.xml" })
 public class ArdApplication {

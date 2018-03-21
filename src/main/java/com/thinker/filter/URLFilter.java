@@ -39,7 +39,7 @@ public class URLFilter implements Filter {
 		ProcessResult processResult = new ProcessResult();
 		String timeStamp = request.getParameter("timeStamp");
 
-		if (System.currentTimeMillis() - Long.parseLong(timeStamp) > 600 * 1000) {
+		if (System.currentTimeMillis() - Long.parseLong(timeStamp) > 60 * 1000) {
 
 			ArdLog.debug(logger, "doFilter", null, "url is time out");
 

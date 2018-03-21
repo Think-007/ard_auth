@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.thinker.auth.domain.ArdType;
 import com.thinker.auth.util.Redis;
 import com.thinker.easylife.dao.EasyLifeMapper;
 import com.thinker.easylife.domain.EasyLife;
@@ -75,6 +76,14 @@ public class EasyLifeServiceImpl implements EasyLifeService {
 			Redis.redis.put(city + weatherMap.get("date"), weather);
 		}
 		return weather;
+	}
+
+	@Override
+	public List<ArdType> getAllTypeByBizID(int id) {
+
+		List<ArdType> typeList = easyLifeMapper.queryTypeByBizId(id);
+
+		return typeList;
 	}
 
 }

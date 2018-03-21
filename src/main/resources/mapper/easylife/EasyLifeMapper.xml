@@ -5,5 +5,12 @@
 	<select id="queryEasyLifeList" resultType="EasyLife">
 		select * from ard_easylife
 	</select>
+	<select id="queryTypeByBizId" resultType="ArdType">
+		select  
+		t.type_id as typeId,
+		t.type_name as typeName,
+		t.picUrl as picUrl
+		from ard_type t where biz_id = #{id}
+	</select>
 
 </mapper>

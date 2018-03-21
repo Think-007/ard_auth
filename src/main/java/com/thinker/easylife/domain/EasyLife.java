@@ -23,6 +23,9 @@ public class EasyLife implements Serializable {
 
 	// 服务地址
 	private String appUrl;
+	
+	//图标地址
+	private String picUrl;
 
 	public String getName() {
 		return name;
@@ -48,10 +51,19 @@ public class EasyLife implements Serializable {
 		this.appUrl = appUrl;
 	}
 
+	public String getPicUrl() {
+		return picUrl;
+	}
+
+	public void setPicUrl(String picUrl) {
+		this.picUrl = picUrl;
+	}
+
 	@Override
 	public String toString() {
 		return "EasyLife [name=" + name + ", type=" + type + ", appUrl="
-				+ appUrl + "]";
+				+ appUrl + ", picUrl=" + picUrl + "]";
 	}
+
 
 }
