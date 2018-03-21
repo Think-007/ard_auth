@@ -77,9 +77,12 @@ public class UserCenterController {
 
 		String userId = request.getHeader("uid");
 
-		userAccountService.updateUseAccountInfoByUseId(userId, bonus);
+		int res = userAccountService.updateUseAccountInfoByUseId(userId, bonus);
 
-		processResult.setRetCode(ProcessResult.SUCCESS);
+		if (res != 0) {
+
+			processResult.setRetCode(ProcessResult.SUCCESS);
+		}
 
 		ArdLog.debug(logger, "finish singnIn", null, processResult);
 		return processResult;
