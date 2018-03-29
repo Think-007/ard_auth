@@ -5,7 +5,6 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.thinker.auth.domain.ArdUser;
-import com.thinker.auth.domain.UserInfoDetail;
 
 public interface ArdUserMapper {
 
@@ -33,13 +32,13 @@ public interface ArdUserMapper {
 	 */
 	public ArdUser queryArdUserByuserId(String userId);
 
-	/**
-	 * 根据电话号码查询用户详情
-	 * 
-	 * @param telNumber
-	 * @return
-	 */
-	public UserInfoDetail queryArdUserDetailByTelNumber(String telNumber);
+//	/**
+//	 * 根据电话号码查询用户详情
+//	 * 
+//	 * @param telNumber
+//	 * @return
+//	 */
+//	public UserInfoDetail queryArdUserDetailByTelNumber(String telNumber);
 
 	/**
 	 * 根据uid更新用户信息

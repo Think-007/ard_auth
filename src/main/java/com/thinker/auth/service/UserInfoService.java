@@ -1,9 +1,12 @@
 package com.thinker.auth.service;
 
+import java.util.List;
+
 import com.thinker.auth.domain.ArdUser;
+import com.thinker.auth.domain.ArdUserAccount;
 import com.thinker.auth.domain.ArdUserAttach;
 import com.thinker.auth.domain.ArdUserBm;
-import com.thinker.auth.domain.UserInfoDetail;
+import com.thinker.auth.domain.ArdUserRole;
 
 public interface UserInfoService {
 
@@ -21,7 +24,7 @@ public interface UserInfoService {
 	 * @param telNumber
 	 * @return
 	 */
-	public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber);
+	// public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber);
 
 	/**
 	 * 根据uid更新头像信息
@@ -49,6 +52,38 @@ public interface UserInfoService {
 	public ArdUser getUserInfoByuserId(String userId);
 
 	/**
+	 * 根据userid查询用户别名信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public ArdUserBm getUserBmById(String userId);
+
+	/**
+	 * 根据uid查询用户角色信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public ArdUserRole getArdUserRoleById(String userId);
+
+	/**
+	 * 根据uid查询绑定信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public List<ArdUserAttach> getAttachListByUid(String userId);
+
+	/**
+	 * 根据uid查询绑定信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public ArdUserAttach getAttachListByTelNumber(String telNumber);
+
+	/**
 	 * 根据uid更新别名
 	 * 
 	 * @param userId
@@ -56,7 +91,8 @@ public interface UserInfoService {
 	 * @return
 	 * @throws Exception
 	 */
-	public ArdUserBm updateUserBm(String userId, String userName) throws Exception;
+	public ArdUserBm updateUserBm(String userId, String userName)
+			throws Exception;
 
 	/**
 	 * 根据uid更新电话号码
@@ -65,6 +101,6 @@ public interface UserInfoService {
 	 * @param telNumber
 	 * @return
 	 */
-	public ArdUserAttach updaetTemNumberByUserId(String userId, String telNumber);
+	public ArdUserAttach updateTemNumberByUserId(String userId, String telNumber);
 
 }

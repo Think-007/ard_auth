@@ -8,4 +8,10 @@ public interface ArdConst {
 	// 积分账户
 	public static final int BONUS = 0;
 
+	// 主账户
+	public static final int MAIN_ATTACH = 1;
+
+	// 绑定其他账户
+	public static final int NORMAL_ATTACH = 0;
+
 }

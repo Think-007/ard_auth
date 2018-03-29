@@ -1,5 +1,7 @@
 package com.thinker.auth.dao;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.thinker.auth.domain.ArdUserRole;
 
 public interface ArdUserRoleMapper {
@@ -10,5 +12,13 @@ public interface ArdUserRoleMapper {
 	 * @return
 	 */
 	public int insertAruUserRole(ArdUserRole ardUserRole);
+
+	/**
+	 * 根据uid查询用户角色信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public ArdUserRole queryAruUserRoleByUserId(@Param("userId") String userId);
 
 }

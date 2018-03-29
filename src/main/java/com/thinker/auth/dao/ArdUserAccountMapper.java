@@ -1,5 +1,10 @@
 package com.thinker.auth.dao;
 
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.junit.runners.Parameterized.Parameters;
+
 import com.thinker.auth.domain.ArdUserAccount;
 
 public interface ArdUserAccountMapper {
@@ -13,12 +18,21 @@ public interface ArdUserAccountMapper {
 	public int insertArdUserAccount(ArdUserAccount ardUserAccount);
 
 	/**
-	 * 根据uid擦护心用户积分账户信息
+	 * 根据uid擦护心用户账户信息
 	 * 
 	 * @param userId
 	 * @return
 	 */
-	public ArdUserAccount queryArdUserAccountByUserId(String userId);
+	public List<ArdUserAccount> queryArdUserAccountByUserId(String userId);
+
+	/**
+	 * 根据uid和账号类型查询账户
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public ArdUserAccount queryArdUserAccountByUserIdAndType(
+			@Param("userId") String userId, @Param("type") int type);
 
 	/**
 	 * 更新用户积分账户信息

@@ -20,14 +20,14 @@ import com.thinker.util.CacheUtil;
 
 @RestController
 @RequestMapping("/auth/code")
-public class AuthCodeController {
+public class CodeController {
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(AuthCodeController.class);
+			.getLogger(CodeController.class);
 
 	@RequestMapping("/publickey")
 	public ProcessResult reqPublicKey() {
-		
+
 		ArdLog.debug(logger, "enter  reqPublicKey", null, null);
 		ProcessResult processResult = new ProcessResult();
 
@@ -67,8 +67,9 @@ public class AuthCodeController {
 			session.setAttribute("smscode", smsCode);
 		} else {
 
-			Redis.redis.put(ArdConst.PROJECT_FLAG+telNumber, smsCode);
-			Redis.redis.put(ArdConst.PROJECT_FLAG+telNumber + "_auth", smsCode);
+			Redis.redis.put(ArdConst.PROJECT_FLAG + telNumber, smsCode);
+			Redis.redis.put(ArdConst.PROJECT_FLAG + telNumber + "_auth",
+					smsCode);
 
 		}
 
@@ -91,13 +92,14 @@ public class AuthCodeController {
 
 		ProcessResult processResult = new ProcessResult();
 
-		String code = (String) Redis.redis.get(ArdConst.PROJECT_FLAG+telNumber);
+		String code = (String) Redis.redis.get(ArdConst.PROJECT_FLAG
+				+ telNumber);
 
 		// 校验短信验证码是否正确
 		if (smsCode != null && smsCode.equals(code)) {
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
-			Redis.redis.remove(ArdConst.PROJECT_FLAG+telNumber);
+			Redis.redis.remove(ArdConst.PROJECT_FLAG + telNumber);
 		} else {
 			processResult.setRetCode(ArdError.SMS_CODE_ERROR);
 			processResult.setRetMsg("验证码错误");

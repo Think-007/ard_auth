@@ -12,6 +12,7 @@ package com.thinker.auth.controller;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -26,12 +27,16 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.thinker.auth.domain.ArdUser;
-import com.thinker.auth.domain.UserInfoDetail;
+import com.thinker.auth.domain.ArdUserAccount;
+import com.thinker.auth.domain.ArdUserAttach;
+import com.thinker.auth.domain.ArdUserBm;
+import com.thinker.auth.domain.ArdUserRole;
 import com.thinker.auth.domain.UserRegistParam;
 import com.thinker.auth.domain.result.LoginResult;
 import com.thinker.auth.exception.PassWordErrorException;
@@ -43,6 +48,7 @@ import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.exception.UserNotExistException;
 import com.thinker.auth.exception.WeiChatRepeatException;
 import com.thinker.auth.service.AuthUserService;
+import com.thinker.auth.service.UserAccountService;
 import com.thinker.auth.service.UserInfoService;
 import com.thinker.auth.service.UserRegistService;
 import com.thinker.auth.util.Redis;
@@ -91,6 +97,10 @@ public class GateController {
 	// 用户信息业务
 	@Resource
 	private UserInfoService userInfoService;
+
+	// 账户业务
+	@Resource
+	private UserAccountService userAccountService;
 
 	/**
 	 * 用户注册接口 手机号_密码_昵称_设备号
@@ -180,13 +190,40 @@ public class GateController {
 		// 将token用客户端给公钥加密
 		String encryptToken = Base64.encode((RSAEncrypt.encrypt(
 				RSAEncrypt.loadPublicKeyByStr(publicKey), retInfo.getBytes())));
-		// 2、返回用户信息
-		UserInfoDetail userInfoDetail = userInfoService
-				.getUserInfoDetailByTelNumber(telnum);
+		// 2、根据telNum或者thirdid查询用户id
+		ArdUser ardUser = userInfoService.getUserInfoByTelNumber(telnum);
+		ardUser.setPassword(null);
+		ardUser.setSalt(null);
+
+		// 3、根据uid查询别名
+		ArdUserBm ardUserBm = userInfoService
+				.getUserBmById(ardUser.getUserId());
+
+		// 4、根据uid查询角色信息
+
+		ArdUserRole ardUserRole = userInfoService.getArdUserRoleById(ardUser
+				.getUserId());
+
+		// 5、根据uid查询attach列表
+		List<ArdUserAttach> attachList = userInfoService
+				.getAttachListByUid(ardUser.getUserId());
+		for (ArdUserAttach temp : attachList) {
+			if (temp.getMainAttach() == ArdConst.MAIN_ATTACH) {
+				ardUser.setMainAttach(temp);
+			}
+		}
+
+		// 6、查询账户列表
+		List<ArdUserAccount> accountList = userAccountService
+				.getUserAccountList(ardUser.getUserId());
 
 		LoginResult loginResult = new LoginResult();
-		loginResult.setUserInfoDetail(userInfoDetail);
 		loginResult.setToken(encryptToken);
+		loginResult.setArdUser(ardUser);
+		loginResult.setArdUserBm(ardUserBm);
+		loginResult.setArdUserRole(ardUserRole);
+		loginResult.setBindList(attachList);
+		loginResult.setAccountList(accountList);
 
 		processResult.setRetObj(loginResult);
 
@@ -194,7 +231,7 @@ public class GateController {
 
 		Redis.redis.put(ArdConst.PROJECT_FLAG + token, loginResult);
 
-		Redis.redis.put(ArdConst.PROJECT_FLAG + loginToken, userInfoDetail);
+		Redis.redis.put(ArdConst.PROJECT_FLAG + loginToken, ardUser);
 	}
 
 	/**
@@ -207,18 +244,16 @@ public class GateController {
 	 * @throws ServletException
 	 */
 	@RequestMapping(value = "/app_authentication", method = RequestMethod.POST)
-	public ProcessResult doLogin(String loginInfo, String key) {
+	public ProcessResult doLogin(String loginInfo, String publicKey) {
 
 		ArdLog.info(logger, "enter doLogin ", null, "loginInfo : " + loginInfo
-				+ " key : " + key);
+				+ " publicKey : " + publicKey);
 
 		ProcessResult processResult = new ProcessResult();
 
 		try {
 			// 1.解析用户登录信息密文
 			String[] userInfo = authUserService.decryptReqStr(loginInfo);
-			// 客户端公钥
-			String publicKey = key;
 
 			String telnum = userInfo[0];
 			String password = userInfo[1];
@@ -278,7 +313,7 @@ public class GateController {
 	 * @return
 	 */
 	@RequestMapping(value = "/app_auto_authentication", method = RequestMethod.POST)
-	public ProcessResult autoLogin(String autoLoginInfo, String key) {
+	public ProcessResult autoLogin(String autoLoginInfo, String publicKey) {
 
 		ArdLog.info(logger, " enter autoLogin", null, " autoLoginInfo : "
 
@@ -290,32 +325,54 @@ public class GateController {
 			// 解析请求参数
 			String[] reqInfo = authUserService.decryptReqStr(autoLoginInfo);
 			String loginToken = reqInfo[0];
-			UserInfoDetail userInfoDetail = (UserInfoDetail) Redis.redis
-					.get(ArdConst.PROJECT_FLAG + loginToken);
+			// 1、根据token获取用户信息
+			ArdUser ardUser = (ArdUser) Redis.redis.get(ArdConst.PROJECT_FLAG
+					+ loginToken);
 
-			// 长连接的token
+			// 保持会话长连接的token,类似session
 			String token = TokenUtil.generateToken();
 
 			String retInfo = token + "_" + loginToken;
 
-			// 将token用客户端给公钥加密返回给客户端
+			// 2、将token用客户端给公钥加密返回给客户端
 			String encryptToken = new String(RSAEncrypt.encrypt(
-					RSAEncrypt.loadPublicKeyByStr(key), retInfo.getBytes()));
+					RSAEncrypt.loadPublicKeyByStr(publicKey),
+					retInfo.getBytes()));
 
-			if (userInfoDetail == null) {
+			if (ardUser == null) {
 				processResult.setRetCode(ArdError.AUTO_LOGIN_TOKEN_TIME_OUT);
 				processResult.setRetMsg("令牌过期");
 
 				return processResult;
 			}
+			// 3、根据uid查询别名
+			ArdUserBm ardUserBm = userInfoService.getUserBmById(ardUser
+					.getUserId());
+
+			// 4、根据uid查询角色信息
+
+			ArdUserRole ardUserRole = userInfoService
+					.getArdUserRoleById(ardUser.getUserId());
+
+			// 5、根据uid查询attach列表
+			List<ArdUserAttach> attachList = userInfoService
+					.getAttachListByUid(ardUser.getUserId());
+
+			// 6、查询账户列表
+			List<ArdUserAccount> accountList = userAccountService
+					.getUserAccountList(ardUser.getUserId());
 			LoginResult loginResult = new LoginResult();
-			loginResult.setUserInfoDetail(userInfoDetail);
 			loginResult.setToken(encryptToken);
+			loginResult.setArdUser(ardUser);
+			loginResult.setArdUserRole(ardUserRole);
+			loginResult.setArdUserBm(ardUserBm);
+			loginResult.setAccountList(accountList);
+			loginResult.setBindList(attachList);
+
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
 			processResult.setRetObj(loginResult);
 		} catch (Throwable t) {
-
 			processResult.setRetCode(ArdError.EXCEPTION);
 			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
 			t.printStackTrace();
@@ -337,10 +394,10 @@ public class GateController {
 	 * @return
 	 */
 	@RequestMapping("/third_auth")
-	public ProcessResult thirdLogin(String thirdInfo, String key, int type) {
+	public ProcessResult thirdLogin(String thirdInfo, String publicKey, int type) {
 
 		ArdLog.info(logger, "enter thirdLogin ", null, " thirdinfo : "
-				+ thirdInfo + " publickey : " + key);
+				+ thirdInfo + " publickey : " + publicKey);
 
 		ProcessResult processResult = new ProcessResult();
 		try {
@@ -351,9 +408,11 @@ public class GateController {
 			String deviceInfo = userInfo[2];
 			String headUrl = userInfo[3];
 			// 2.查看是否存在,如果不存在就注册
-			UserInfoDetail userInfoDetail = userInfoService
-					.getUserInfoDetailByTelNumber(thirdId);
-			if (userInfoDetail == null) {
+			// UserInfoDetail userInfoDetail = userInfoService
+			// .getUserInfoDetailByTelNumber(thirdId);
+			ArdUserAttach ardUserAttach = userInfoService
+					.getAttachListByTelNumber(thirdId);
+			if (ardUserAttach == null) {
 				UserRegistParam userRegistParam = new UserRegistParam();
 				userRegistParam.setTelNumber(thirdId);
 				userRegistParam.setUserName(userName);
@@ -371,7 +430,7 @@ public class GateController {
 						ArdUserConst.NORMAL_USER, type);
 			}
 			// 5.登录
-			login(key, processResult, thirdId, deviceInfo);
+			login(publicKey, processResult, thirdId, deviceInfo);
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
 

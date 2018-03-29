@@ -1,5 +1,7 @@
 package com.thinker.auth.dao;
 
+import java.util.List;
+
 import com.thinker.auth.domain.ArdUserAttach;
 
 public interface ArdUserAttachMapper {
@@ -27,5 +29,13 @@ public interface ArdUserAttachMapper {
 	 * @return
 	 */
 	public ArdUserAttach queryUserAttachByTelNum(String telNumber);
+
+	/**
+	 * 根据uid查询绑定信息列表
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public List<ArdUserAttach> queryUserAttachByUserId(String userId);
 
 }

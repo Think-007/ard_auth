@@ -30,7 +30,7 @@ public class ArdUser implements Serializable {
 	// 盐值
 	private String salt;
 
-	// 性别 0未知 1 男  2女
+	// 性别 0未知 1 男 2女
 	private int sex;
 
 	// 用户状态 0正常 1实名 2锁定 -1注销
@@ -41,6 +41,9 @@ public class ArdUser implements Serializable {
 
 	// 用户角色
 	private List<ArdRole> roles;
+
+	// 初次绑定的账号
+	private ArdUserAttach mainAttach;
 
 	// 创建时间
 	private Date createTime;
@@ -109,12 +112,20 @@ public class ArdUser implements Serializable {
 		this.createTime = createTime;
 	}
 
+	public ArdUserAttach getMainAttach() {
+		return mainAttach;
+	}
+
+	public void setMainAttach(ArdUserAttach mainAttach) {
+		this.mainAttach = mainAttach;
+	}
+
 	@Override
 	public String toString() {
 		return "ArdUser [userId=" + userId + ", password=" + password
 				+ ", salt=" + salt + ", sex=" + sex + ", status=" + status
-				+ ", level=" + level + ", roles=" + roles + ", createTime="
-				+ createTime + "]";
+				+ ", level=" + level + ", roles=" + roles + ", mainAttach="
+				+ mainAttach + ", createTime=" + createTime + "]";
 	}
 
 }

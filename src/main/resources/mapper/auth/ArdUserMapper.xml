@@ -49,7 +49,7 @@
 
 	</select>
 
-	<select id="queryArdUserDetailByTelNumber" resultType="UserInfoDetail">
+<!-- 	<select id="queryArdUserDetailByTelNumber" resultType="UserInfoDetail">
 
 		select
 		t1.user_id as userId,t1.sex as sex,
@@ -66,7 +66,7 @@
 		t1.user_id=t4.user_id
 		where t2.tel_num=#{telNumber}
 
-	</select>
+	</select> -->
 
 	<update id="updateArdUser">
 		update ard_user

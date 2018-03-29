@@ -20,6 +20,15 @@
 		)
 
 	</insert>
+	<select id="queryArdUserAccountByUserIdAndType" resultType="ArdUserAccount">
+		select
+		user_id as userId,
+		account_type as accountType,
+		balance as balance,
+		updatetime as updateTime
+		from ard_user_account
+		where user_id = #{userId} and account_type=#{type}
+	</select>
 
 	<select id="queryArdUserAccountByUserId" resultType="ArdUserAccount">
 
@@ -33,15 +42,16 @@
 
 
 	</select>
-	
-		<update id="updateArdUserAccount" parameterType="ArdUserAccount">
-		update ard_user_account
-		
-		set 
+
+	<update id="updateArdUserAccount" parameterType="ArdUserAccount">
+		update
+		ard_user_account
+
+		set
 		balance = #{balance}
-		
-		where user_id = #{userId}
-	
+
+		where user_id = #{userId} and account_type=#{accountType}
+
 	</update>
 
 	<!-- <select id="test" resultType="int"> select 1 from dual; </select> -->

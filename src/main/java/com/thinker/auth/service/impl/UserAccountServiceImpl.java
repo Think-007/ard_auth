@@ -3,6 +3,7 @@ package com.thinker.auth.service.impl;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.thinker.auth.dao.ArdUserAccountMapper;
 import com.thinker.auth.domain.ArdUserAccount;
 import com.thinker.auth.service.UserAccountService;
+import com.thinker.util.ArdConst;
 
 @Service
 public class UserAccountServiceImpl implements UserAccountService {
@@ -21,19 +23,17 @@ public class UserAccountServiceImpl implements UserAccountService {
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
 	@Override
-	public ArdUserAccount getUserAccountInfoByUserId(String userId) {
-		// TODO Auto-generated method stub
+	public List<ArdUserAccount> getUserAccountList(String userId) {
 
-		ArdUserAccount ardUserAccount = ardUserAccountMapper
+		List<ArdUserAccount> ardUserAccount = ardUserAccountMapper
 				.queryArdUserAccountByUserId(userId);
 		return ardUserAccount;
 	}
 
 	@Override
 	public int updateUseAccountInfoByUseId(String userId, double bonus) {
-		// TODO Auto-generated method stub
 		ArdUserAccount ardUserAccount = ardUserAccountMapper
-				.queryArdUserAccountByUserId(userId);
+				.queryArdUserAccountByUserIdAndType(userId, ArdConst.BONUS);
 
 		Date today = Calendar.getInstance().getTime();
 

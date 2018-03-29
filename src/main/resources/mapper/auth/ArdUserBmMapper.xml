@@ -22,9 +22,17 @@
 		set 
 		username = #{userName}
 		
-		where userId = #{userId}
+		where user_id = #{userId}
 	
 	</update>
+	
+	<select id="queryUserBmByUid" resultType="ArdUserBm">
+		select 
+		user_id as userId,
+		username as userName
+		from ard_user_bm
+		where user_id = #{userId}
+	</select>
 
 
 

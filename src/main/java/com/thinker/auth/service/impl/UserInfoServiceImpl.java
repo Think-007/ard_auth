@@ -1,5 +1,7 @@
 package com.thinker.auth.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
@@ -7,10 +9,11 @@ import org.springframework.stereotype.Service;
 import com.thinker.auth.dao.ArdUserAttachMapper;
 import com.thinker.auth.dao.ArdUserBmMapper;
 import com.thinker.auth.dao.ArdUserMapper;
+import com.thinker.auth.dao.ArdUserRoleMapper;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserAttach;
 import com.thinker.auth.domain.ArdUserBm;
-import com.thinker.auth.domain.UserInfoDetail;
+import com.thinker.auth.domain.ArdUserRole;
 import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.service.UserInfoService;
 
@@ -29,6 +32,10 @@ public class UserInfoServiceImpl implements UserInfoService {
 	@Resource
 	private ArdUserBmMapper ardUserBmMapper;
 
+	// 用户角色信息
+	@Resource
+	private ArdUserRoleMapper ardUserRoleMapper;
+
 	// // 用户附属信息查询
 	// @Resource
 	// private ArdUserAttachMapper ardUserAttachMapper;
@@ -45,14 +52,14 @@ public class UserInfoServiceImpl implements UserInfoService {
 		return ardUser;
 	}
 
-	@Override
-	public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber) {
-
-		UserInfoDetail userInfoDetail = ardUserMapper
-				.queryArdUserDetailByTelNumber(telNumber);
-
-		return userInfoDetail;
-	}
+	// @Override
+	// public UserInfoDetail getUserInfoDetailByTelNumber(String telNumber) {
+	//
+	// UserInfoDetail userInfoDetail = ardUserMapper
+	// .queryArdUserDetailByTelNumber(telNumber);
+	//
+	// return userInfoDetail;
+	// }
 
 	@Override
 	public ArdUserAttach updateUserHeadPic(String userId, String thumbURL,
@@ -84,7 +91,8 @@ public class UserInfoServiceImpl implements UserInfoService {
 	}
 
 	@Override
-	public ArdUserBm updateUserBm(String userId, String userName) throws Exception {
+	public ArdUserBm updateUserBm(String userId, String userName)
+			throws Exception {
 		// TODO Auto-generated method stub
 
 		ArdUserBm bm = new ArdUserBm();
@@ -101,7 +109,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 	}
 
 	@Override
-	public ArdUserAttach updaetTemNumberByUserId(String userId, String telNumber) {
+	public ArdUserAttach updateTemNumberByUserId(String userId, String telNumber) {
 		// TODO Auto-generated method stub
 
 		ArdUserAttach ardUserAttach = new ArdUserAttach();
@@ -113,4 +121,37 @@ public class UserInfoServiceImpl implements UserInfoService {
 		return ardUserAttach;
 	}
 
+	@Override
+	public ArdUserBm getUserBmById(String userId) {
+
+		ArdUserBm ardUserBm = ardUserBmMapper.queryUserBmByUid(userId);
+
+		return ardUserBm;
+	}
+
+	@Override
+	public ArdUserRole getArdUserRoleById(String userId) {
+
+		ArdUserRole ardUserRole = ardUserRoleMapper
+				.queryAruUserRoleByUserId(userId);
+		return ardUserRole;
+	}
+
+	@Override
+	public List<ArdUserAttach> getAttachListByUid(String userId) {
+
+		List<ArdUserAttach> userAttachList = ardUserAttachMapper
+				.queryUserAttachByUserId(userId);
+
+		return userAttachList;
+	}
+
+	@Override
+	public ArdUserAttach getAttachListByTelNumber(String telNumber) {
+
+		ArdUserAttach ardUserAttach = ardUserAttachMapper
+				.queryUserAttachByTelNum(telNumber);
+
+		return ardUserAttach;
+	}
 }

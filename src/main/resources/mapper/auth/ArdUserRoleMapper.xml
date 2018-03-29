@@ -14,6 +14,15 @@
 		)
 		
 	</insert>
+	
+	<select id="queryAruUserRoleByUserId" resultType="ArdUserRole">
+		select 
+			user_id as userId,
+			role_id as roleId
+		from ard_user_role
+		where user_id=#{userId}
+		
+	</select>
 
 
 	<!-- <select id="queryComissionCountAndSum" resultType="java.util.Map"> 

@@ -12,12 +12,17 @@ public class ArdUserAttach implements Serializable {
 
 	// 用户id
 	private String userId;
+	// 类型（手机、微信、qq、微博）
+	private int type;
 	// 用户电话(第三方id)
 	private String telNum;
 	// 缩略图地址
 	private String thumbURL;
 	// 头像地址
 	private String headpicURL;
+
+	// 是否是第一次注册绑定的账号
+	private int mainAttach;
 
 	// 创建时间
 	private Date createTime;
@@ -62,10 +67,27 @@ public class ArdUserAttach implements Serializable {
 		this.createTime = createTime;
 	}
 
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public int getMainAttach() {
+		return mainAttach;
+	}
+
+	public void setMainAttach(int mainAttach) {
+		this.mainAttach = mainAttach;
+	}
+
 	@Override
 	public String toString() {
-		return "ArdUserAttach [userId=" + userId + ", telNum=" + telNum
-				+ ", thumbURL=" + thumbURL + ", headpicURL=" + headpicURL
+		return "ArdUserAttach [userId=" + userId + ", type=" + type
+				+ ", telNum=" + telNum + ", thumbURL=" + thumbURL
+				+ ", headpicURL=" + headpicURL + ", mainAttach=" + mainAttach
 				+ ", createTime=" + createTime + "]";
 	}
 

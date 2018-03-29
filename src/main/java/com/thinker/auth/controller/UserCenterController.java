@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +25,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.thinker.auth.domain.ArdUser;
 import com.thinker.auth.domain.ArdUserAttach;
 import com.thinker.auth.domain.ArdUserBm;
+import com.thinker.auth.domain.UserRegistParam;
 import com.thinker.auth.exception.UserNameRepeatException;
 import com.thinker.auth.service.AuthUserService;
 import com.thinker.auth.service.UserAccountService;
 import com.thinker.auth.service.UserInfoService;
+import com.thinker.auth.service.UserRegistService;
 import com.thinker.auth.util.Redis;
 import com.thinker.creator.domain.ProcessResult;
 import com.thinker.util.ArdConst;
@@ -57,6 +60,10 @@ public class UserCenterController {
 	// 用户账户业务
 	@Resource
 	private UserAccountService userAccountService;
+
+	// 绑定用户信息业务
+	@Resource
+	private UserRegistService userRegistService;
 
 	// 签到积分
 	@Value("${ard.bonus}")
@@ -93,7 +100,6 @@ public class UserCenterController {
 	public ProcessResult userSetting(HttpServletRequest request,
 			HttpServletResponse response) {
 		ArdLog.debug(logger, "enter settings", null, null);
-		;
 
 		ProcessResult processResult = new ProcessResult();
 
@@ -326,6 +332,8 @@ public class UserCenterController {
 	public ProcessResult resetTelnumber(HttpServletRequest request,
 			HttpServletResponse response, String telNumber, String smsCode) {
 
+		ArdLog.debug(logger, "enter resetTelnumber", null, " telNumber : "
+				+ telNumber + " smsCode : " + smsCode);
 		ProcessResult processResult = new ProcessResult();
 
 		String userId = request.getHeader("uid");
@@ -342,10 +350,13 @@ public class UserCenterController {
 		}
 
 		// 更新电话
-		ArdUserAttach ardUserAttach = userInfoService.updaetTemNumberByUserId(
+		ArdUserAttach ardUserAttach = userInfoService.updateTemNumberByUserId(
 				userId, telNumber);
 
 		processResult.setRetObj(ardUserAttach);
+
+		ArdLog.debug(logger, "finishi resetTelnumber", null,
+				" processresult : " + processResult);
 
 		return processResult;
 
@@ -387,6 +398,46 @@ public class UserCenterController {
 		}
 
 		ArdLog.debug(logger, "finish modifyUserName", null, processResult);
+		return processResult;
+	}
+
+	/**
+	 * 绑定第三方信息
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/bindinfo", method = RequestMethod.POST)
+	public ProcessResult bindThirdInfo(HttpServletRequest request,
+			String thirdInfo, int bindType) {
+		ArdLog.debug(logger, "enter bindThirdInfo", null, " thirdInfo : "
+				+ thirdInfo + " bindType : " + bindType);
+		ProcessResult processResult = new ProcessResult();
+		String userId = request.getHeader("uid");
+
+		try {
+			// 1.获取第三方信息.
+			String[] userInfo = authUserService.decryptReqStr(thirdInfo);
+			String thirdId = userInfo[0];
+			String userName = userInfo[1];
+			String headUrl = userInfo[3];
+
+			// 2.构造参数，绑定信息
+			UserRegistParam userRegistParam = new UserRegistParam();
+			userRegistParam.setTelNumber(thirdId);
+			userRegistParam.setUserName(userName);
+			userRegistParam.setHeadPicUrl(headUrl);
+			processResult = userRegistService.bindThirdInfo(userRegistParam,
+					bindType, userId, ArdConst.NORMAL_ATTACH, Calendar
+							.getInstance().getTime());
+		} catch (Throwable t) {
+			processResult.setRetCode(ArdError.EXCEPTION);
+			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
+			t.printStackTrace();
+		}
+
+		ArdLog.debug(logger, "finish bindThirdInfo", null, "processresult : "
+				+ processResult);
+
 		return processResult;
 	}
 

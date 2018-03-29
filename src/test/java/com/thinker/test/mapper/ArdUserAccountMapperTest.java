@@ -21,21 +21,21 @@ public class ArdUserAccountMapperTest {
 	@Test
 	public void test() {
 
-		//insert
-//		ArdUserAccount ardUserAccount = new ArdUserAccount();
-//
-//		ardUserAccount.setUserId("ddddssss");
-//		ardUserAccount.setBalance(9);
-//		ardUserAccount.setAccountType(0);
-//		int res = ardUserAccountMapper.insertArdUserAccount(ardUserAccount);
-//
-//		Assert.assertTrue(1 == res);
-		
-		//query
-		ArdUserAccount a =ardUserAccountMapper.queryArdUserAccountByUserId("ddddssss");
+		// insert
+		// ArdUserAccount ardUserAccount = new ArdUserAccount();
+		//
+		// ardUserAccount.setUserId("ddddssss");
+		// ardUserAccount.setBalance(9);
+		// ardUserAccount.setAccountType(0);
+		// int res = ardUserAccountMapper.insertArdUserAccount(ardUserAccount);
+		//
+		// Assert.assertTrue(1 == res);
 
-		System.out.println(a);
+		// query
+		// ArdUserAccount a
+		// =ardUserAccountMapper.queryArdUserAccountByUserId("ddddssss");
+
+		// System.out.println(a);
 	}
-
 
 }

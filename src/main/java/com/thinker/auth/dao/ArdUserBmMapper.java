@@ -9,6 +9,8 @@
 
 package com.thinker.auth.dao;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.thinker.auth.domain.ArdUserBm;
 
 /**
@@ -35,5 +37,13 @@ public interface ArdUserBmMapper {
 	 * @return
 	 */
 	public int updateUserBm(ArdUserBm ardUserBm);
+
+	/**
+	 * 根据uid查询用户别名信息
+	 * 
+	 * @param userId
+	 * @return
+	 */
+	public ArdUserBm queryUserBmByUid(@Param("userId") String userId);
 
 }
