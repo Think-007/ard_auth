@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50525
 File Encoding         : 65001
 
-Date: 2018-03-22 15:41:31
+Date: 2018-03-29 17:07:05
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -29,6 +29,64 @@ CREATE TABLE `ard_easylife` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of ard_easylife
+-- ----------------------------
+INSERT INTO `ard_easylife` VALUES ('dddd', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt', '6', 'wwww.git.com', null);
+INSERT INTO `ard_easylife` VALUES ('dddd1', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd2', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee3', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff4', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss5', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt6', '6', 'wwww.git.com', null);
+INSERT INTO `ard_easylife` VALUES ('dddd11', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd22', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee33', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff44', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss55', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt66', '6', 'wwww.git.com', null);
+INSERT INTO `ard_easylife` VALUES ('dddd9', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd9', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee9', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff9', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss9', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt9', '6', 'wwww.git.com', null);
+INSERT INTO `ard_easylife` VALUES ('dddd19', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd29', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee39', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff49', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss59', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt69', '6', 'wwww.git.com', null);
+INSERT INTO `ard_easylife` VALUES ('dddd119', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd229', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee339', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff449', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss559', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt669', '6', 'wwww.git.com', null);
+INSERT INTO `ard_easylife` VALUES ('dddd91', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd92', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee93', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff94', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss95', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt96', '6', 'wwww.git.com', null);
+INSERT INTO `ard_easylife` VALUES ('dddd197', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd298', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee399', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff493', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss594', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt694', '6', 'wwww.git.com', null);
+INSERT INTO `ard_easylife` VALUES ('dddd1194', '3', 'www.baidu.co', null);
+INSERT INTO `ard_easylife` VALUES ('qwd2294', '4', 'www.baidu.com', null);
+INSERT INTO `ard_easylife` VALUES ('eeee3394', '3', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ffff4494', '4', 'wwww.baidu.com', '');
+INSERT INTO `ard_easylife` VALUES ('ssss5594', '5', 'www.google.com', null);
+INSERT INTO `ard_easylife` VALUES ('tttt6694', '6', 'wwww.git.com', null);
+
+-- ----------------------------
 -- Table structure for ard_news
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_news`;
@@ -45,6 +103,10 @@ CREATE TABLE `ard_news` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of ard_news
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for ard_news_attach
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_news_attach`;
@@ -58,6 +120,10 @@ CREATE TABLE `ard_news_attach` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of ard_news_attach
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for ard_news_hot
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_news_hot`;
@@ -68,6 +134,10 @@ CREATE TABLE `ard_news_hot` (
   KEY `news_id` (`news_id`),
   CONSTRAINT `ard_news_hot_ibfk_1` FOREIGN KEY (`news_id`) REFERENCES `ard_news` (`news_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of ard_news_hot
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for ard_news_theme
@@ -86,6 +156,10 @@ CREATE TABLE `ard_news_theme` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of ard_news_theme
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for ard_news_type
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_news_type`;
@@ -95,6 +169,10 @@ CREATE TABLE `ard_news_type` (
   PRIMARY KEY (`type_id`),
   UNIQUE KEY `type_id` (`type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of ard_news_type
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for ard_permission
@@ -108,6 +186,10 @@ CREATE TABLE `ard_permission` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of ard_permission
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for ard_role
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_role`;
@@ -118,6 +200,10 @@ CREATE TABLE `ard_role` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of ard_role
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for ard_role_permission
@@ -133,6 +219,10 @@ CREATE TABLE `ard_role_permission` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of ard_role_permission
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for ard_type
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_type`;
@@ -143,6 +233,17 @@ CREATE TABLE `ard_type` (
   `picUrl` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`biz_id`,`type_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of ard_type
+-- ----------------------------
+INSERT INTO `ard_type` VALUES ('0', '3', '新闻', '33333');
+INSERT INTO `ard_type` VALUES ('0', '4', '游戏', '99999999');
+INSERT INTO `ard_type` VALUES ('0', '5', '体育', '88888888888');
+INSERT INTO `ard_type` VALUES ('1', '1', '北京', '00000000000');
+INSERT INTO `ard_type` VALUES ('1', '3', '唐山', 'jfioqofjiewfi');
+INSERT INTO `ard_type` VALUES ('1', '4', '内蒙', '32423423');
+INSERT INTO `ard_type` VALUES ('0', '6', '综艺', 'oooioio');
 
 -- ----------------------------
 -- Table structure for ard_user
@@ -164,6 +265,11 @@ CREATE TABLE `ard_user` (
 PARTITIONS 10 */;
 
 -- ----------------------------
+-- Records of ard_user
+-- ----------------------------
+INSERT INTO `ard_user` VALUES ('132921626', 'f0d0fc8e1e69ac80eab8f42f9643966a', '2721854f3c3616f1b956f194709f0fc6', '0', '0', '0', '2018-03-23 09:22:14', null);
+
+-- ----------------------------
 -- Table structure for ard_user_account
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_user_account`;
@@ -179,6 +285,11 @@ CREATE TABLE `ard_user_account` (
 PARTITIONS 10 */;
 
 -- ----------------------------
+-- Records of ard_user_account
+-- ----------------------------
+INSERT INTO `ard_user_account` VALUES ('132921626', '0', '0', null);
+
+-- ----------------------------
 -- Table structure for ard_user_attach
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_user_attach`;
@@ -190,11 +301,17 @@ CREATE TABLE `ard_user_attach` (
   `headpic_url` varchar(255) DEFAULT NULL,
   `create_time` datetime NOT NULL,
   `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `main_attach` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`tel_num`),
   UNIQUE KEY `telnumber` (`tel_num`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 /*!50100 PARTITION BY KEY (tel_num)
 PARTITIONS 10 */;
+
+-- ----------------------------
+-- Records of ard_user_attach
+-- ----------------------------
+INSERT INTO `ard_user_attach` VALUES ('132921626', null, '13011836133', '固定值', '固定值', '2018-03-23 09:22:14', null, '1');
 
 -- ----------------------------
 -- Table structure for ard_user_bm
@@ -212,6 +329,11 @@ CREATE TABLE `ard_user_bm` (
 PARTITIONS 10 */;
 
 -- ----------------------------
+-- Records of ard_user_bm
+-- ----------------------------
+INSERT INTO `ard_user_bm` VALUES ('132921626', '呵呵哒', '2018-03-23 09:22:14', null);
+
+-- ----------------------------
 -- Table structure for ard_user_role
 -- ----------------------------
 DROP TABLE IF EXISTS `ard_user_role`;
@@ -224,6 +346,11 @@ CREATE TABLE `ard_user_role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 /*!50100 PARTITION BY KEY (user_id)
 PARTITIONS 10 */;
+
+-- ----------------------------
+-- Records of ard_user_role
+-- ----------------------------
+INSERT INTO `ard_user_role` VALUES ('132921626', '0', '2018-03-23 09:22:14', null);
 
 -- ----------------------------
 -- Table structure for ard_video
@@ -239,6 +366,12 @@ CREATE TABLE `ard_video` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Records of ard_video
+-- ----------------------------
+INSERT INTO `ard_video` VALUES ('北京值声', '1', '爆头', 'afasfafaf');
+INSERT INTO `ard_video` VALUES ('唐哈值声', '3', '可爱', '890890890890890890');
+
+-- ----------------------------
 -- Table structure for tst
 -- ----------------------------
 DROP TABLE IF EXISTS `tst`;
@@ -247,6 +380,10 @@ CREATE TABLE `tst` (
   `val` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of tst
+-- ----------------------------
 
 -- ----------------------------
 -- View structure for ard_news_-1
