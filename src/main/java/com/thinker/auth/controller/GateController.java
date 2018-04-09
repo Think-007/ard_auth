@@ -527,46 +527,46 @@ public class GateController {
 
 	}
 
-	@RequestMapping("/testparam")
-	public ProcessResult testParam(HttpServletRequest request,
-			HttpServletResponse response, String telNumber, String a) {
-
-		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
-
-		Enumeration<String> paramNames = request.getParameterNames();
-
-		while (paramNames.hasMoreElements()) {
-			String paramName = paramNames.nextElement();
-
-			if (paramName.equals("sign")) {
-				continue;
-			}
-
-			System.out.println(paramName);
-
-			String paramValues = (String) request.getParameter(paramName);
-
-			System.out.println(paramValues);
-
-			paramsMap.put(paramName, paramValues);
-
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		Set es = paramsMap.entrySet();
-		Iterator it = es.iterator();
-		while (it.hasNext()) {
-			Map.Entry entry = (Map.Entry) it.next();
-			String k = (String) entry.getKey();
-			String v = (String) entry.getValue();
-			if (null != v && !"".equals(v)) {
-				sb.append(k + "=" + v + "&");
-			}
-		}
-		sb.append("token=" + "token");
-		System.out.println("服务端签名" + sb.toString());
-		return null;
-	}
+//	@RequestMapping("/testparam")
+//	public ProcessResult testParam(HttpServletRequest request,
+//			HttpServletResponse response, String telNumber, String a) {
+//
+//		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
+//
+//		Enumeration<String> paramNames = request.getParameterNames();
+//
+//		while (paramNames.hasMoreElements()) {
+//			String paramName = paramNames.nextElement();
+//
+//			if (paramName.equals("sign")) {
+//				continue;
+//			}
+//
+//			System.out.println(paramName);
+//
+//			String paramValues = (String) request.getParameter(paramName);
+//
+//			System.out.println(paramValues);
+//
+//			paramsMap.put(paramName, paramValues);
+//
+//		}
+//
+//		StringBuilder sb = new StringBuilder();
+//
+//		Set es = paramsMap.entrySet();
+//		Iterator it = es.iterator();
+//		while (it.hasNext()) {
+//			Map.Entry entry = (Map.Entry) it.next();
+//			String k = (String) entry.getKey();
+//			String v = (String) entry.getValue();
+//			if (null != v && !"".equals(v)) {
+//				sb.append(k + "=" + v + "&");
+//			}
+//		}
+//		sb.append("token=" + "token");
+//		System.out.println("服务端签名" + sb.toString());
+//		return null;
+//	}
 
 }
