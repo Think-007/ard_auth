@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50525
 File Encoding         : 65001
 
-Date: 2018-04-10 18:41:53
+Date: 2018-04-10 20:09:04
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -213,7 +213,7 @@ CREATE TABLE `ard_role_permission` (
   `role_id` int(11) DEFAULT NULL,
   `source_id` int(11) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
-  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   KEY `role_id` (`role_id`),
   CONSTRAINT `ard_role_permission_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `ard_role` (`role_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -267,7 +267,7 @@ PARTITIONS 10 */;
 -- ----------------------------
 -- Records of ard_user
 -- ----------------------------
-INSERT INTO `ard_user` VALUES ('132921626', 'f0d0fc8e1e69ac80eab8f42f9643966a', '2721854f3c3616f1b956f194709f0fc6', '0', '0', '0', '2018-03-23 09:22:14', '2018-04-10 18:43:14');
+INSERT INTO `ard_user` VALUES ('468720394', '14e767a0fe9cab6270d5d56ac8aa6600', '0e832684f361e1491ed91e5ee835c187', '0', '0', '0', '2018-04-10 19:44:59', '0000-00-00 00:00:00');
 
 -- ----------------------------
 -- Table structure for ard_user_account
@@ -277,7 +277,7 @@ CREATE TABLE `ard_user_account` (
   `user_id` varchar(30) NOT NULL,
   `account_type` tinyint(4) NOT NULL,
   `balance` double DEFAULT NULL,
-  `updatetime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
+  `updatetime` timestamp NOT NULL DEFAULT '2018-01-01 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`,`account_type`),
   UNIQUE KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -287,7 +287,7 @@ PARTITIONS 10 */;
 -- ----------------------------
 -- Records of ard_user_account
 -- ----------------------------
-INSERT INTO `ard_user_account` VALUES ('132921626', '0', '0', '2018-04-10 18:47:46');
+INSERT INTO `ard_user_account` VALUES ('468720394', '0', '15', '2018-04-10 20:14:27');
 
 -- ----------------------------
 -- Table structure for ard_user_attach
@@ -300,7 +300,7 @@ CREATE TABLE `ard_user_attach` (
   `thumb_url` varchar(255) DEFAULT NULL,
   `headpic_url` varchar(255) DEFAULT NULL,
   `create_time` datetime NOT NULL,
-  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   `main_attach` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`tel_num`),
   UNIQUE KEY `telnumber` (`tel_num`)
@@ -311,7 +311,7 @@ PARTITIONS 10 */;
 -- ----------------------------
 -- Records of ard_user_attach
 -- ----------------------------
-INSERT INTO `ard_user_attach` VALUES ('132921626', null, '13011836133', '固定值', '固定值', '2018-03-23 09:22:14', null, '1');
+INSERT INTO `ard_user_attach` VALUES ('468720394', null, '123456789', 'headUrlheadUrlheadUrl', 'headUrlheadUrlheadUrl', '2018-04-10 19:44:59', '0000-00-00 00:00:00', '1');
 
 -- ----------------------------
 -- Table structure for ard_user_bm
@@ -321,7 +321,7 @@ CREATE TABLE `ard_user_bm` (
   `user_id` varchar(30) NOT NULL,
   `username` varchar(32) NOT NULL,
   `create_time` datetime NOT NULL,
-  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`username`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -331,7 +331,7 @@ PARTITIONS 10 */;
 -- ----------------------------
 -- Records of ard_user_bm
 -- ----------------------------
-INSERT INTO `ard_user_bm` VALUES ('132921626', '呵呵哒hhhh', '2018-03-23 09:22:14', '2018-04-10 18:46:11');
+INSERT INTO `ard_user_bm` VALUES ('468720394', '呵呵呵7800.', '2018-04-10 19:44:59', '0000-00-00 00:00:00');
 
 -- ----------------------------
 -- Table structure for ard_user_role
@@ -341,7 +341,7 @@ CREATE TABLE `ard_user_role` (
   `user_id` varchar(30) NOT NULL,
   `role_id` int(11) DEFAULT NULL,
   `create_time` datetime NOT NULL,
-  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 /*!50100 PARTITION BY KEY (user_id)
@@ -350,7 +350,7 @@ PARTITIONS 10 */;
 -- ----------------------------
 -- Records of ard_user_role
 -- ----------------------------
-INSERT INTO `ard_user_role` VALUES ('132921626', '0', '2018-03-23 09:22:14', null);
+INSERT INTO `ard_user_role` VALUES ('468720394', '0', '2018-04-10 19:44:59', '0000-00-00 00:00:00');
 
 -- ----------------------------
 -- Table structure for ard_video
