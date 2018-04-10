@@ -45,6 +45,9 @@ public class ArdUser implements Serializable {
 	// 初次绑定的账号
 	private ArdUserAttach mainAttach;
 
+	// 是否设置密码，0没设置，1，已设置
+	private int hasPassword;
+
 	// 创建时间
 	private Date createTime;
 
@@ -120,12 +123,21 @@ public class ArdUser implements Serializable {
 		this.mainAttach = mainAttach;
 	}
 
+	public int getHasPassword() {
+		return hasPassword;
+	}
+
+	public void setHasPassword(int hasPassword) {
+		this.hasPassword = hasPassword;
+	}
+
 	@Override
 	public String toString() {
 		return "ArdUser [userId=" + userId + ", password=" + password
 				+ ", salt=" + salt + ", sex=" + sex + ", status=" + status
 				+ ", level=" + level + ", roles=" + roles + ", mainAttach="
-				+ mainAttach + ", createTime=" + createTime + "]";
+				+ mainAttach + ", hasPassword=" + hasPassword + ", createTime="
+				+ createTime + "]";
 	}
 
 }

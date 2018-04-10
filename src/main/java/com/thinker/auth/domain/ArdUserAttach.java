@@ -14,6 +14,10 @@ public class ArdUserAttach implements Serializable {
 	private String userId;
 	// 类型（手机、微信、qq、微博）
 	private int type;
+
+	// 绑定第三方的名称
+	private String thirdName;
+
 	// 用户电话(第三方id)
 	private String telNum;
 	// 缩略图地址
@@ -83,12 +87,21 @@ public class ArdUserAttach implements Serializable {
 		this.mainAttach = mainAttach;
 	}
 
+	public String getThirdName() {
+		return thirdName;
+	}
+
+	public void setThirdName(String thirdName) {
+		this.thirdName = thirdName;
+	}
+
 	@Override
 	public String toString() {
 		return "ArdUserAttach [userId=" + userId + ", type=" + type
-				+ ", telNum=" + telNum + ", thumbURL=" + thumbURL
-				+ ", headpicURL=" + headpicURL + ", mainAttach=" + mainAttach
-				+ ", createTime=" + createTime + "]";
+				+ ", thirdName=" + thirdName + ", telNum=" + telNum
+				+ ", thumbURL=" + thumbURL + ", headpicURL=" + headpicURL
+				+ ", mainAttach=" + mainAttach + ", createTime=" + createTime
+				+ "]";
 	}
 
 }

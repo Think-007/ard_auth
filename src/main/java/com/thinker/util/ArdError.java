@@ -40,4 +40,8 @@ public interface ArdError {
 	// 自动登录令牌过期
 	public static final int AUTO_LOGIN_TOKEN_TIME_OUT = 20004;
 
+	// **********************状态**************************
+	// 提示已经签到
+	public static final int SIGNED_OVER = 30001;
+
 }

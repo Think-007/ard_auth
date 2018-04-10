@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50525
 File Encoding         : 65001
 
-Date: 2018-03-29 17:07:05
+Date: 2018-04-10 18:41:53
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -257,7 +257,7 @@ CREATE TABLE `ard_user` (
   `status` mediumint(16) DEFAULT '0',
   `level` mediumint(16) DEFAULT '0',
   `create_time` datetime NOT NULL,
-  `update_time` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id` (`user_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -267,7 +267,7 @@ PARTITIONS 10 */;
 -- ----------------------------
 -- Records of ard_user
 -- ----------------------------
-INSERT INTO `ard_user` VALUES ('132921626', 'f0d0fc8e1e69ac80eab8f42f9643966a', '2721854f3c3616f1b956f194709f0fc6', '0', '0', '0', '2018-03-23 09:22:14', null);
+INSERT INTO `ard_user` VALUES ('132921626', 'f0d0fc8e1e69ac80eab8f42f9643966a', '2721854f3c3616f1b956f194709f0fc6', '0', '0', '0', '2018-03-23 09:22:14', '2018-04-10 18:43:14');
 
 -- ----------------------------
 -- Table structure for ard_user_account
@@ -277,7 +277,7 @@ CREATE TABLE `ard_user_account` (
   `user_id` varchar(30) NOT NULL,
   `account_type` tinyint(4) NOT NULL,
   `balance` double DEFAULT NULL,
-  `updatetime` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `updatetime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`,`account_type`),
   UNIQUE KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
@@ -287,7 +287,7 @@ PARTITIONS 10 */;
 -- ----------------------------
 -- Records of ard_user_account
 -- ----------------------------
-INSERT INTO `ard_user_account` VALUES ('132921626', '0', '0', null);
+INSERT INTO `ard_user_account` VALUES ('132921626', '0', '0', '2018-04-10 18:47:46');
 
 -- ----------------------------
 -- Table structure for ard_user_attach
@@ -331,7 +331,7 @@ PARTITIONS 10 */;
 -- ----------------------------
 -- Records of ard_user_bm
 -- ----------------------------
-INSERT INTO `ard_user_bm` VALUES ('132921626', '呵呵哒', '2018-03-23 09:22:14', null);
+INSERT INTO `ard_user_bm` VALUES ('132921626', '呵呵哒hhhh', '2018-03-23 09:22:14', '2018-04-10 18:46:11');
 
 -- ----------------------------
 -- Table structure for ard_user_role

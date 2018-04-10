@@ -3,7 +3,6 @@ package com.thinker.auth.dao;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.junit.runners.Parameterized.Parameters;
 
 import com.thinker.auth.domain.ArdUserAccount;
 

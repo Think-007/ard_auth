@@ -6,6 +6,7 @@
 	<insert id="insertUserAttach">
 		insert into ard_user_attach(
 		user_id,
+		type,
 		tel_num,
 		thumb_url,
 		headpic_url,
@@ -14,6 +15,7 @@
 		)
 		values(
 		#{userId},
+		#{type},
 		#{telNum},
 		#{thumbURL},
 		#{headpicURL},

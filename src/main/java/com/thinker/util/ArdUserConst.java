@@ -55,5 +55,15 @@ public interface ArdUserConst {
 	 * 微博注册
 	 */
 	public static final int SINA = 3;
+	
+	/**
+	 * 已经设置密码
+	 */
+	public static final int HAS_PWD=1;
+	
+	/**
+	 * 尚未设置密码
+	 */
+	public static final int NO_PWD=0;
 
 }

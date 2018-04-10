@@ -31,7 +31,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 	}
 
 	@Override
-	public int updateUseAccountInfoByUseId(String userId, double bonus) {
+	public ArdUserAccount updateUseAccountInfoByUseId(String userId,
+			double bonus) {
 		ArdUserAccount ardUserAccount = ardUserAccountMapper
 				.queryArdUserAccountByUserIdAndType(userId, ArdConst.BONUS);
 
@@ -39,14 +40,14 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 		if (sdf.format(ardUserAccount.getUpdateTime())
 				.equals(sdf.format(today))) {
-			return 0;
+			return null;
 		}
 
 		ardUserAccount.setBalance(ardUserAccount.getBalance() + bonus);
 
-		int result = ardUserAccountMapper.updateArdUserAccount(ardUserAccount);
+		ardUserAccountMapper.updateArdUserAccount(ardUserAccount);
 
-		return result;
+		return ardUserAccount;
 	}
 
 }

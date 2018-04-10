@@ -16,7 +16,7 @@
 		)
 
 	</insert>
-	<update id="updateUseBm">
+	<update id="updateUserBm">
 	
 		update ard_user_bm
 		set 

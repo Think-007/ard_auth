@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.thinker.auth.domain.ArdUser;
+import com.thinker.auth.domain.ArdUserAccount;
 import com.thinker.auth.domain.ArdUserAttach;
 import com.thinker.auth.domain.ArdUserBm;
 import com.thinker.auth.domain.UserRegistParam;
@@ -78,17 +79,31 @@ public class UserCenterController {
 	public ProcessResult singnIn(HttpServletRequest request,
 			HttpServletResponse response) {
 		ArdLog.debug(logger, "enter singnIn", null, null);
-		;
 
 		ProcessResult processResult = new ProcessResult();
 
-		String userId = request.getHeader("uid");
+		try {
+			String userId = request.getHeader("uid");
 
-		int res = userAccountService.updateUseAccountInfoByUseId(userId, bonus);
+			System.out.println("--------------->" + userId);
 
-		if (res != 0) {
+			ArdUserAccount ardUserAccount = userAccountService
+					.updateUseAccountInfoByUseId(userId, bonus);
 
-			processResult.setRetCode(ProcessResult.SUCCESS);
+			if (ardUserAccount != null) {
+
+				processResult.setRetCode(ProcessResult.SUCCESS);
+				processResult.setRetMsg("ok");
+				processResult.setRetObj(ardUserAccount);
+			} else {
+				processResult.setRetCode(ArdError.SIGNED_OVER);
+				processResult.setRetMsg("signed over");
+			}
+		} catch (Throwable t) {
+			processResult.setRetCode(ArdError.EXCEPTION);
+			processResult.setRetMsg(ArdError.EXCEPTION_MSG);
+			ArdLog.error(logger, "signin", null, null, t);
+			t.printStackTrace();
 		}
 
 		ArdLog.debug(logger, "finish singnIn", null, processResult);
@@ -249,20 +264,27 @@ public class UserCenterController {
 		ProcessResult processResult = new ProcessResult();
 		try {
 			// 解析用户 旧密码
-			String userId = (String) request.getAttribute("uid");
+			String userId = (String) request.getHeader("uid");
 			String[] reqInfo = authUserService.decryptReqStr(oldPassword);
 			System.out.println(reqInfo.length + reqInfo[0]);
 
 			// 1.根据uid查询用户信息
 			ArdUser ardUser = userInfoService.getUserInfoByuserId(userId);
+			System.out.println(ardUser);
 			if (ardUser != null) {
 
 				Md5Hash mh = new Md5Hash(reqInfo[0], ardUser.getSalt(),
 						hashIterations);
+				System.out.println(mh.toString());
+
+				String userPwd = mh.toString();
 				// 2.判断就密码是否正确
-				if (mh.toString().equals(ardUser.getPassword())) {
+				if (userPwd.equals(ardUser.getPassword())) {
 					processResult.setRetCode(ProcessResult.SUCCESS);
 					processResult.setRetMsg("ok");
+				} else {
+					processResult.setRetCode(ArdError.PASSWORD_ERROR);
+					processResult.setRetMsg("pwd error");
 				}
 
 			}
@@ -408,7 +430,7 @@ public class UserCenterController {
 	 */
 	@RequestMapping(value = "/bindinfo", method = RequestMethod.POST)
 	public ProcessResult bindThirdInfo(HttpServletRequest request,
-			String thirdInfo, int bindType) {
+			String thirdInfo, int bindType, String headUrl) {
 		ArdLog.debug(logger, "enter bindThirdInfo", null, " thirdInfo : "
 				+ thirdInfo + " bindType : " + bindType);
 		ProcessResult processResult = new ProcessResult();
@@ -419,7 +441,6 @@ public class UserCenterController {
 			String[] userInfo = authUserService.decryptReqStr(thirdInfo);
 			String thirdId = userInfo[0];
 			String userName = userInfo[1];
-			String headUrl = userInfo[3];
 
 			// 2.构造参数，绑定信息
 			UserRegistParam userRegistParam = new UserRegistParam();
@@ -468,6 +489,15 @@ public class UserCenterController {
 	@RequestMapping("/unbind")
 	public ProcessResult unbindTelNumber(HttpServletRequest request,
 			HttpServletResponse response, String telNumber) {
+
+		ProcessResult result = new ProcessResult();
+
+		return result;
+	}
+
+	@RequestMapping("/feedBack")
+	public ProcessResult feedBack(HttpServletRequest request,
+			HttpServletResponse response, String feedBackInfo) {
 
 		ProcessResult result = new ProcessResult();
 

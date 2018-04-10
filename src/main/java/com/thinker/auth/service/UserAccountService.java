@@ -27,6 +27,6 @@ public interface UserAccountService {
 	 * @param bonus
 	 * @return
 	 */
-	public int updateUseAccountInfoByUseId(String userId, double bonus);
+	public ArdUserAccount updateUseAccountInfoByUseId(String userId, double bonus);
 
 }

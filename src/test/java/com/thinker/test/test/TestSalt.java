@@ -23,9 +23,9 @@ public class TestSalt {
 		 * algorithmName, Object source, Object salt, int hashIterations)
 		 * 构造方法实现盐值加密 String algorithmName 为加密算法 支持md5 base64 等
 		 */
-		SimpleHash sh = new SimpleHash("md5", source, salt, hashIterations);
-		// 打印最终结果
-		System.out.println(sh.toString());
+//		SimpleHash sh = new SimpleHash("md5", source, salt, hashIterations);
+//		// 打印最终结果
+//		System.out.println(sh.toString());
 	}
 
 }

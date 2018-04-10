@@ -55,6 +55,9 @@ public class LoginResult implements Serializable {
 	// 用户token 加密后信息
 	private String token;
 
+	// 是否签到 0未签到,1已签到
+	private int isSigned;
+
 	public String getToken() {
 		return token;
 	}
@@ -103,11 +106,20 @@ public class LoginResult implements Serializable {
 		this.accountList = accountList;
 	}
 
+	public int getIsSigned() {
+		return isSigned;
+	}
+
+	public void setIsSigned(int isSigned) {
+		this.isSigned = isSigned;
+	}
+
 	@Override
 	public String toString() {
 		return "LoginResult [ardUser=" + ardUser + ", ardUserBm=" + ardUserBm
 				+ ", ardUserRole=" + ardUserRole + ", bindList=" + bindList
-				+ ", accountList=" + accountList + ", token=" + token + "]";
+				+ ", accountList=" + accountList + ", token=" + token
+				+ ", isSigned=" + isSigned + "]";
 	}
 
 }

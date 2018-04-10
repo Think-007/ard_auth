@@ -63,8 +63,9 @@ public class UserRegistServiceImpl implements UserRegistService {
 		if (regitsType == ArdUserConst.PHONE) {
 			ardUserBm.setUserName(userRegistParam.getUserName());
 		} else {
-			ardUserBm.setUserName(userRegistParam.getUserName() + Math.random()
-					* 10000);
+			String userBm = userRegistParam.getUserName() + Math.random()
+					* 10000;
+			ardUserBm.setUserName(userBm.substring(0, 8));
 		}
 		ardUserBm.setCreateTime(createTime);
 		try {
@@ -74,7 +75,8 @@ public class UserRegistServiceImpl implements UserRegistService {
 			throw new UserNameRepeatException("用户名重复");
 		}
 		// 3.绑定用户信息
-		bindThirdInfo(userRegistParam, regitsType, userId,ArdConst.MAIN_ATTACH, createTime);
+		bindThirdInfo(userRegistParam, regitsType, userId,
+				ArdConst.MAIN_ATTACH, createTime);
 
 		// 4.定位用户角色
 		ArdUserRole ardUserRole = new ArdUserRole();

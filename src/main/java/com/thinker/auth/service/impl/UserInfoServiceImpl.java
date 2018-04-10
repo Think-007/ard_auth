@@ -86,8 +86,10 @@ public class UserInfoServiceImpl implements UserInfoService {
 
 	@Override
 	public ArdUser getUserInfoByuserId(String userId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		ArdUser arduser = ardUserMapper.queryArdUserByuserId(userId);
+
+		return arduser;
 	}
 
 	@Override

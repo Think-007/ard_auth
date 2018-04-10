@@ -10,6 +10,9 @@
 package com.thinker.auth.controller;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -78,6 +81,7 @@ public class GateController {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(GateController.class);
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
 	// 随机盐值
 	@Value("${shiro.salt}")
@@ -194,6 +198,7 @@ public class GateController {
 		ArdUser ardUser = userInfoService.getUserInfoByTelNumber(telnum);
 		ardUser.setPassword(null);
 		ardUser.setSalt(null);
+		ardUser.setHasPassword(ArdUserConst.HAS_PWD);
 
 		// 3、根据uid查询别名
 		ArdUserBm ardUserBm = userInfoService
@@ -217,6 +222,18 @@ public class GateController {
 		List<ArdUserAccount> accountList = userAccountService
 				.getUserAccountList(ardUser.getUserId());
 
+		// 7、判断今日是否签到
+		int isSigned = 0;
+		for (ArdUserAccount temp : accountList) {
+			if (temp.getAccountType() == ArdConst.BONUS) {
+				Date today = Calendar.getInstance().getTime();
+				if (sdf.format(temp.getUpdateTime()).equals(sdf.format(today))) {
+					isSigned = 1;
+				}
+				break;
+			}
+		}
+
 		LoginResult loginResult = new LoginResult();
 		loginResult.setToken(encryptToken);
 		loginResult.setArdUser(ardUser);
@@ -224,6 +241,7 @@ public class GateController {
 		loginResult.setArdUserRole(ardUserRole);
 		loginResult.setBindList(attachList);
 		loginResult.setAccountList(accountList);
+		loginResult.setIsSigned(isSigned);
 
 		processResult.setRetObj(loginResult);
 
@@ -394,7 +412,8 @@ public class GateController {
 	 * @return
 	 */
 	@RequestMapping("/third_auth")
-	public ProcessResult thirdLogin(String thirdInfo, String publicKey, int type) {
+	public ProcessResult thirdLogin(String thirdInfo, String publicKey,
+			int type, String headUrl) {
 
 		ArdLog.info(logger, "enter thirdLogin ", null, " thirdinfo : "
 				+ thirdInfo + " publickey : " + publicKey);
@@ -406,7 +425,6 @@ public class GateController {
 			String thirdId = userInfo[0];
 			String userName = userInfo[1];
 			String deviceInfo = userInfo[2];
-			String headUrl = userInfo[3];
 			// 2.查看是否存在,如果不存在就注册
 			// UserInfoDetail userInfoDetail = userInfoService
 			// .getUserInfoDetailByTelNumber(thirdId);
@@ -527,46 +545,46 @@ public class GateController {
 
 	}
 
-//	@RequestMapping("/testparam")
-//	public ProcessResult testParam(HttpServletRequest request,
-//			HttpServletResponse response, String telNumber, String a) {
-//
-//		SortedMap<String, String> paramsMap = new TreeMap<String, String>();
-//
-//		Enumeration<String> paramNames = request.getParameterNames();
-//
-//		while (paramNames.hasMoreElements()) {
-//			String paramName = paramNames.nextElement();
-//
-//			if (paramName.equals("sign")) {
-//				continue;
-//			}
-//
-//			System.out.println(paramName);
-//
-//			String paramValues = (String) request.getParameter(paramName);
-//
-//			System.out.println(paramValues);
-//
-//			paramsMap.put(paramName, paramValues);
-//
-//		}
-//
-//		StringBuilder sb = new StringBuilder();
-//
-//		Set es = paramsMap.entrySet();
-//		Iterator it = es.iterator();
-//		while (it.hasNext()) {
-//			Map.Entry entry = (Map.Entry) it.next();
-//			String k = (String) entry.getKey();
-//			String v = (String) entry.getValue();
-//			if (null != v && !"".equals(v)) {
-//				sb.append(k + "=" + v + "&");
-//			}
-//		}
-//		sb.append("token=" + "token");
-//		System.out.println("服务端签名" + sb.toString());
-//		return null;
-//	}
+	// @RequestMapping("/testparam")
+	// public ProcessResult testParam(HttpServletRequest request,
+	// HttpServletResponse response, String telNumber, String a) {
+	//
+	// SortedMap<String, String> paramsMap = new TreeMap<String, String>();
+	//
+	// Enumeration<String> paramNames = request.getParameterNames();
+	//
+	// while (paramNames.hasMoreElements()) {
+	// String paramName = paramNames.nextElement();
+	//
+	// if (paramName.equals("sign")) {
+	// continue;
+	// }
+	//
+	// System.out.println(paramName);
+	//
+	// String paramValues = (String) request.getParameter(paramName);
+	//
+	// System.out.println(paramValues);
+	//
+	// paramsMap.put(paramName, paramValues);
+	//
+	// }
+	//
+	// StringBuilder sb = new StringBuilder();
+	//
+	// Set es = paramsMap.entrySet();
+	// Iterator it = es.iterator();
+	// while (it.hasNext()) {
+	// Map.Entry entry = (Map.Entry) it.next();
+	// String k = (String) entry.getKey();
+	// String v = (String) entry.getValue();
+	// if (null != v && !"".equals(v)) {
+	// sb.append(k + "=" + v + "&");
+	// }
+	// }
+	// sb.append("token=" + "token");
+	// System.out.println("服务端签名" + sb.toString());
+	// return null;
+	// }
 
 }
