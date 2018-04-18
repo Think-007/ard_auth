@@ -7,9 +7,13 @@ import com.thinker.easylife.domain.EasyLife;
 
 public class EasyLifeResult {
 
+	// 便民应用列表
 	private List<EasyLife> easyLifeList;
-
+	// 应用类型列表
 	private List<ArdType> typeList;
+
+	// 最近使用列表
+	private List<EasyLife> recentEasyLifeList;
 
 	public List<EasyLife> getEasyLifeList() {
 		return easyLifeList;
@@ -27,10 +31,18 @@ public class EasyLifeResult {
 		this.typeList = typeList;
 	}
 
+	public List<EasyLife> getRecentEasyLifeList() {
+		return recentEasyLifeList;
+	}
+
+	public void setRecentEasyLifeList(List<EasyLife> recentEasyLifeList) {
+		this.recentEasyLifeList = recentEasyLifeList;
+	}
+
 	@Override
 	public String toString() {
 		return "EasyLifeResult [easyLifeList=" + easyLifeList + ", typeList="
-				+ typeList + "]";
+				+ typeList + ", recentEasyLifeList=" + recentEasyLifeList + "]";
 	}
 
 }

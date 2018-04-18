@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author lipengfeia
  *
  */
-public class EasyLife implements Serializable {
+public class EasyLife implements Serializable, Comparable<EasyLife>, Cloneable {
 
 	/**
 	 * 
@@ -23,8 +23,8 @@ public class EasyLife implements Serializable {
 
 	// 服务地址
 	private String appUrl;
-	
-	//图标地址
+
+	// 图标地址
 	private String picUrl;
 
 	public String getName() {
@@ -65,5 +65,21 @@ public class EasyLife implements Serializable {
 				+ appUrl + ", picUrl=" + picUrl + "]";
 	}
 
+	@Override
+	public int compareTo(EasyLife o) {
+
+		return this.name.compareTo(o.getName());
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+
+		EasyLife temp = new EasyLife();
+		temp.setAppUrl(this.appUrl);
+		temp.setName(this.name);
+		temp.setPicUrl(this.picUrl);
+		temp.setType(this.type);
+		return temp;
+	}
 
 }
