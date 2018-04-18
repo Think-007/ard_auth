@@ -196,9 +196,13 @@ public class GateController {
 				RSAEncrypt.loadPublicKeyByStr(publicKey), retInfo.getBytes())));
 		// 2、根据telNum或者thirdid查询用户id
 		ArdUser ardUser = userInfoService.getUserInfoByTelNumber(telnum);
-		ardUser.setPassword(null);
-		ardUser.setSalt(null);
-		ardUser.setHasPassword(ArdUserConst.HAS_PWD);
+		if (ardUser.getPassword() == null) {
+			ardUser.setHasPassword(ArdUserConst.NO_PWD);
+		} else {
+			ardUser.setHasPassword(ArdUserConst.HAS_PWD);
+			ardUser.setPassword(null);
+			ardUser.setSalt(null);
+		}
 
 		// 3、根据uid查询别名
 		ArdUserBm ardUserBm = userInfoService
@@ -324,7 +328,7 @@ public class GateController {
 	}
 
 	/**
-	 * 自动登录接口
+	 * 自动登录接口 加密自动登录token字段
 	 * 
 	 * @param autoLoginInfo
 	 *            自动登录令牌用公钥加密
@@ -353,9 +357,9 @@ public class GateController {
 			String retInfo = token + "_" + loginToken;
 
 			// 2、将token用客户端给公钥加密返回给客户端
-			String encryptToken = new String(RSAEncrypt.encrypt(
+			String encryptToken = Base64.encode((RSAEncrypt.encrypt(
 					RSAEncrypt.loadPublicKeyByStr(publicKey),
-					retInfo.getBytes()));
+					retInfo.getBytes())));
 
 			if (ardUser == null) {
 				processResult.setRetCode(ArdError.AUTO_LOGIN_TOKEN_TIME_OUT);
@@ -379,6 +383,20 @@ public class GateController {
 			// 6、查询账户列表
 			List<ArdUserAccount> accountList = userAccountService
 					.getUserAccountList(ardUser.getUserId());
+
+			// 7、判断今日是否签到
+			int isSigned = 0;
+			for (ArdUserAccount temp : accountList) {
+				if (temp.getAccountType() == ArdConst.BONUS) {
+					Date today = Calendar.getInstance().getTime();
+					if (sdf.format(temp.getUpdateTime()).equals(
+							sdf.format(today))) {
+						isSigned = 1;
+					}
+					break;
+				}
+			}
+
 			LoginResult loginResult = new LoginResult();
 			loginResult.setToken(encryptToken);
 			loginResult.setArdUser(ardUser);
@@ -386,6 +404,7 @@ public class GateController {
 			loginResult.setArdUserBm(ardUserBm);
 			loginResult.setAccountList(accountList);
 			loginResult.setBindList(attachList);
+			loginResult.setIsSigned(isSigned);
 
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetMsg("ok");
@@ -401,7 +420,7 @@ public class GateController {
 	}
 
 	/**
-	 * 第三方登录接口 第三方id_用户名_设备号_头像地址
+	 * 第三方登录接口 第三方id_用户名_设备号
 	 * 
 	 * @param thirdInfo
 	 *            加密后的登录信息
@@ -435,14 +454,14 @@ public class GateController {
 				userRegistParam.setTelNumber(thirdId);
 				userRegistParam.setUserName(userName);
 				userRegistParam.setHeadPicUrl(headUrl);
-				userRegistParam.setPassword("123456");
-				// 3.密码加盐
-				ArdLog.debug(logger, "third registUser", null, "salt: "
-						+ saltStr + "hashIterations: " + hashIterations);
-				Md5Hash mh = new Md5Hash(userRegistParam.getPassword(),
-						saltStr, hashIterations);
-				System.out.println(mh.toString());
-				userRegistParam.setPassword(mh.toString());
+				// userRegistParam.setPassword("123456");
+				// // 3.密码加盐
+				// ArdLog.debug(logger, "third registUser", null, "salt: "
+				// + saltStr + "hashIterations: " + hashIterations);
+				// Md5Hash mh = new Md5Hash(userRegistParam.getPassword(),
+				// saltStr, hashIterations);
+				// System.out.println(mh.toString());
+				// userRegistParam.setPassword(mh.toString());
 				// 4.注册用户
 				userRegistService.regitsUser(userRegistParam, saltStr,
 						ArdUserConst.NORMAL_USER, type);

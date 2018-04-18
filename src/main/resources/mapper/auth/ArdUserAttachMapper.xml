@@ -7,6 +7,7 @@
 		insert into ard_user_attach(
 		user_id,
 		type,
+		third_name,
 		tel_num,
 		thumb_url,
 		headpic_url,
@@ -16,6 +17,7 @@
 		values(
 		#{userId},
 		#{type},
+		#{thirdName},
 		#{telNum},
 		#{thumbURL},
 		#{headpicURL},
@@ -47,6 +49,8 @@
 	<select id="queryUserAttachByTelNum" resultType="ArdUserAttach">
 		select
 		user_id as userId,
+		type as type,
+		third_name as thirdName,
 		tel_num as telNum,
 		thumb_url as thumbURL,
 		headpic_url as headpicURL,
@@ -61,6 +65,8 @@
 		select
 		user_id as userId,
 		tel_num as telNum,
+		type as type,
+		third_name as thirdName,
 		thumb_url as thumbURL,
 		headpic_url as headpicURL,
 		main_attach as mainAttach

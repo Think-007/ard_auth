@@ -124,6 +124,7 @@ public class UserRegistServiceImpl implements UserRegistService {
 
 		ArdUserAttach ardUserAttach = new ArdUserAttach();
 		ardUserAttach.setUserId(userId);
+		ardUserAttach.setThirdName(userRegistParam.getUserName());
 		ardUserAttach.setTelNum(userRegistParam.getTelNumber());
 		ardUserAttach.setThumbURL(userRegistParam.getHeadPicUrl());
 		ardUserAttach.setHeadpicURL(userRegistParam.getHeadPicUrl());

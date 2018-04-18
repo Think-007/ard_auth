@@ -16,6 +16,7 @@ import org.apache.shiro.crypto.hash.Md5Hash;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -248,7 +249,7 @@ public class UserCenterController {
 	}
 
 	/**
-	 * 校验旧密码
+	 * 校验旧密码 加密旧密码字段
 	 * 
 	 * @param request
 	 * @param response
@@ -302,7 +303,7 @@ public class UserCenterController {
 	}
 
 	/**
-	 * 更新新密码
+	 * 更新新密码 加密新密码字段
 	 * 
 	 * @param request
 	 * @param response
@@ -424,7 +425,7 @@ public class UserCenterController {
 	}
 
 	/**
-	 * 绑定第三方信息
+	 * 绑定第三方信息 加密thirdId_用户名
 	 * 
 	 * @return
 	 */
@@ -488,18 +489,30 @@ public class UserCenterController {
 	 */
 	@RequestMapping("/unbind")
 	public ProcessResult unbindTelNumber(HttpServletRequest request,
-			HttpServletResponse response, String telNumber) {
+			HttpServletResponse response, String thirdId, int type) {
 
 		ProcessResult result = new ProcessResult();
-
+		// 1、删除绑定信息后，还要确定主账号
+		result.setRetCode(ProcessResult.SUCCESS);
 		return result;
 	}
+
+	/**
+	 * 意见反馈
+	 * 
+	 * @param request
+	 * @param response
+	 * @param feedBackInfo
+	 * @return
+	 */
 
 	@RequestMapping("/feedBack")
 	public ProcessResult feedBack(HttpServletRequest request,
 			HttpServletResponse response, String feedBackInfo) {
 
 		ProcessResult result = new ProcessResult();
+
+		result.setRetCode(ProcessResult.SUCCESS);
 
 		return result;
 	}
