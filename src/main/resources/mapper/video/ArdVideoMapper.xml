@@ -5,5 +5,10 @@
 	<select id="queryAllVideoList" resultType="ArdVideo">
 		select * from ard_video
 	</select>
+	
+	<select id="listArdAdv" resultType="ArdAdvertiseMent">
+		select pic_url as picUrl,adv_url as advUrl  from ard_adv
+	
+	</select>
 
 </mapper>

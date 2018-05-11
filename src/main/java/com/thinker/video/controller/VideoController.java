@@ -17,6 +17,7 @@ import com.thinker.creator.domain.ProcessResult;
 import com.thinker.easylife.service.EasyLifeService;
 import com.thinker.util.ArdError;
 import com.thinker.util.ArdLog;
+import com.thinker.video.domain.ArdAdvertiseMent;
 import com.thinker.video.domain.ArdVideo;
 import com.thinker.video.service.ArdVideoService;
 
@@ -43,23 +44,18 @@ public class VideoController {
 		try {
 			List<ArdVideo> videoList = new ArrayList<ArdVideo>();
 
-			/*
-			 * for (int i = 0; i < 10; i++) { ArdVideo video = new ArdVideo();
-			 * video.setAddress("北京"); video.setName("阿尔丁电台" + (int)
-			 * (Math.random() * 100)); video.setType("type");
-			 * video.setVideoUrl("www.baidu.com");
-			 * 
-			 * list.add(video);
-			 * 
-			 * }
-			 */
-
+			// 1、查询视听列表
 			videoList = ardVideoService.getAllVideoList();
 
+			// 2、查询视听类型
 			List<ArdType> typeList = easyLifeService.getAllTypeByBizID(1);
+
+			// 3、查询滚动广告
+			List<ArdAdvertiseMent> advList = ardVideoService.queryArdAdvList();
 			VideoResult result = new VideoResult();
 			result.setVideoList(videoList);
 			result.setTypeList(typeList);
+			result.setAdvList(advList);
 
 			processResult.setRetCode(ProcessResult.SUCCESS);
 			processResult.setRetObj(result);

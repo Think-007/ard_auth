@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.thinker.easylife.controller.EasyLifeController;
 import com.thinker.util.ArdLog;
 import com.thinker.video.dao.ArdVideoMapper;
+import com.thinker.video.domain.ArdAdvertiseMent;
 import com.thinker.video.domain.ArdVideo;
 import com.thinker.video.service.ArdVideoService;
 
@@ -32,6 +33,14 @@ public class ArdVideoServiceImpl implements ArdVideoService {
 		ArdLog.info(logger, "getAllVideoList", null, videoList);
 
 		return videoList;
+	}
+
+	@Override
+	public List<ArdAdvertiseMent> queryArdAdvList() {
+
+		List<ArdAdvertiseMent> advList = ardVideoMapper.listArdAdv();
+
+		return advList;
 	}
 
 }
